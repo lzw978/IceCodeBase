@@ -1,4 +1,0 @@
-test lzw978
-mytest is ok
-
-test more
