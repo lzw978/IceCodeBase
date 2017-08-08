@@ -32,9 +32,13 @@ char g_szLogPath[100];        // 日志路径
 char g_szLogFileName[35];     // 日志名称
 char g_szLogFileNameOld[35];  // 旧日志名称
 int  g_iLogLevel;             // 日志等级
-char g_szMsgId[64+1];         // 消息ID值
+char g_szMsgId[30+1];         // 消息ID值
 char g_szErrLogFile[300];     // 错误日志
 char *g_szTmpG;               // 打印信息
+
+string g_strErrLogFilePath;   // 错误日志路径
+string g_strErrLogFileName;   // 错误日志名称
+string g_strErrLogFileExt;    // 错误日志扩展名
 
 
 // 获取当前系统时间
@@ -270,6 +274,20 @@ void ReSetLogFileName()
 void SetErrLogFile(const char *pErrLogFile)
 {
     strcpy(g_szErrLogFile, pErrLogFile);
+
+    int iIdxStart = 0;
+    int iIdxEnd = 0;
+    
+    string strErrLogPathName = pErrLogFile;
+    iIdxStart = strErrLogPathName.find_last_of('/');
+    iIdxEnd = strErrLogPathName.find_last_of('.');
+    
+    if(iIdxStart * iIdxEnd > 0)
+    {
+        g_strErrLogFilePath = strErrLogPathName.substr(0,iIdxStart+1);
+        g_strErrLogFileName = strErrLogPathName.substr(iIdxStart+1,iIdxEnd-iIdxStart-1);
+        g_strErrLogFileExt = strErrLogPathName.substr(iIdxEnd);
+    }
 }
 
 // 日志打印函数
@@ -381,7 +399,7 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* e
             strcpy(szFileName, pFileName);
         }
 
-        fprintf(logFile, "[%07d|%11d|%s|%s|%30s|%06d|%7s]%s\n", getpid(), (int)pthread_self(), szTime, g_szMsgId, szFileName, iFileLine, szErrType, g_szTmpG);
+        fprintf(logFile, "[%07d|%11d|%s|%s|%30s|%06d|%7s]: %s\n", getpid(), (int)pthread_self(), szTime, g_szMsgId, szFileName, iFileLine, szErrType, g_szTmpG);
 
         fclose(logFile);
 
@@ -393,10 +411,34 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* e
             // 测试都记录
             if (strlen(g_szErrLogFile) > 0)
             {
+                // 超过每个日志文件最大容量
+                if (g_iMaxFileSize > 0)
+                {
+                    struct stat stbuf;
+            
+                    if ( 0 == stat(g_szErrLogFile, &stbuf) ) 
+                    {
+                        if (stbuf.st_size >= g_iMaxFileSize)
+                        {
+                            string strNewFile = "";
+                            //合成路径
+                            strNewFile  = g_strErrLogFilePath;
+                            strNewFile += "/";
+                            strNewFile += g_strErrLogFileName;
+                            strNewFile += ".";
+                            strNewFile += szDate;
+                            strNewFile += ".";
+                            strNewFile += szTime;
+                            strNewFile += g_strErrLogFileExt;
+                            
+                            rename(g_szErrLogFile, strNewFile.c_str());
+                        }
+                    }
+                }
                 FILE *pError = fopen(g_szErrLogFile, "a+");
                 if (NULL != pError)
                 {
-                    fprintf(pError, "[%07d|%11d|%s%s|%s|%30.30s|%06d|%7s]%s\n", getpid(), (int)pthread_self(), szDate,szTime, g_szMsgId, szFileName, iFileLine, szErrType, g_szTmpG);
+                    fprintf(pError, "[%07d|%11d|%s%s|%s|%30.30s|%06d|%7s]: %s\n", getpid(), (int)pthread_self(), szDate, szTime, g_szMsgId, szFileName, iFileLine, szErrType, g_szTmpG);
 
                     fclose(pError);
                 }
