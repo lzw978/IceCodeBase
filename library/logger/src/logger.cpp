@@ -25,16 +25,16 @@ using namespace std;
 
 #include "logger.h"
 
-#define LOG_BUF 1024*1024*3  // 日志缓存区大小,默认3M
+#define LOG_BUF 1024*1024*3   // 日志缓存区大小,默认3M
 
-int  g_iMaxFileSize = 0;
-char g_szLogPath[100];
-char g_szLogFileName[35];
-char g_szLogFileNameOld[35];
-int  g_iLogLevel;
-char g_szMsgId[64+1];
-char g_szErrLogFile[300];
-char *g_szTmpG;
+int  g_iMaxFileSize = 0;      // 日志最大容量
+char g_szLogPath[100];        // 日志路径
+char g_szLogFileName[35];     // 日志名称
+char g_szLogFileNameOld[35];  // 旧日志名称
+int  g_iLogLevel;             // 日志等级
+char g_szMsgId[64+1];         // 消息ID值
+char g_szErrLogFile[300];     // 错误日志
+char *g_szTmpG;               // 打印信息
 
 
 // 获取当前系统时间
@@ -75,7 +75,7 @@ const char* GetLOGTimePath(char* lpBuf, char* lpTime)
     sprintf(lpBuf, "%04d%02d%02d", 1900 + p->tm_year, 1 + p->tm_mon, p->tm_mday);
     sprintf(lpTime, "%02d:%02d:%02d:%06d", p->tm_hour, p->tm_min, p->tm_sec, (int)tp.tv_usec);
 
-    //2009-09-09 09:09:09.123
+    //2017-01-02 11:22:33.123
     return lpBuf;
 }
 
@@ -127,7 +127,6 @@ bool IsUTF8ToLOG(const void* pBuffer, long size)
     }
 
     unsigned char* start = (unsigned char*)pBuffer;
-
     unsigned char* end = (unsigned char*)pBuffer + size;
 
     while(start < end)
@@ -140,7 +139,6 @@ bool IsUTF8ToLOG(const void* pBuffer, long size)
         else if (*start < (0xC0))
         {
             IsUTF8 = false;
-
             break;
         }
 
@@ -152,7 +150,6 @@ bool IsUTF8ToLOG(const void* pBuffer, long size)
             if ((start[1] & (0xC0)) != 0x80)
             {
                 IsUTF8 = false;
-
                 break;
             }
 
@@ -166,7 +163,6 @@ bool IsUTF8ToLOG(const void* pBuffer, long size)
             if ((start[1] & (0xC0)) != 0x80 || (start[2] & (0xC0)) != 0x80)
             {
                 IsUTF8 = false;
-
                 break;
             }
 
@@ -175,7 +171,6 @@ bool IsUTF8ToLOG(const void* pBuffer, long size)
         else
         {
             IsUTF8 = false;
-
             break;
         }
     }
@@ -198,7 +193,6 @@ bool CreatePathDir(const char* lpPathName)
 
     //目录名中不用于出现的字符
     strncpy(szPath, lpPathName, sizeof(szPath) - 1);
-
     nLen = strlen(szPath);
 
     for (int i = 0; i <= nLen; i++)
