@@ -1,11 +1,11 @@
 /********************************************************************
-ÎÄ¼şÃû£ºlogger.h
-´´½¨ÈË£ºlzw978@163.com
-ÈÕ  ÆÚ£º2017-08-08
-ĞŞ¸ÄÈË£º
-ÈÕ  ÆÚ£º
-Ãè  Êö£º¼ÇÂ¼ÈÕÖ¾
-°æ  ±¾£º
+æ–‡ä»¶åï¼šlogger.h
+åˆ›å»ºäººï¼šlzw978@163.com
+æ—¥  æœŸï¼š2017-08-08
+ä¿®æ”¹äººï¼š
+æ—¥  æœŸï¼š
+æ  è¿°ï¼šè®°å½•æ—¥å¿—
+ç‰ˆ  æœ¬ï¼š
 ********************************************************************/
 
 #ifndef __LIB_LOGGER_H__
@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ÈÕÖ¾µÈ¼¶
+// æ—¥å¿—ç­‰çº§
 enum LOG_LEVEL
 { 
     L_SYS       = 0,
@@ -25,23 +25,23 @@ enum LOG_LEVEL
     L_DEBUG     = 4
 };
 
-// ÉèÖÃÈÕÖ¾×î´óÖµ
+// è®¾ç½®æ—¥å¿—æœ€å¤§å€¼
 void SetLogMaxSize(int iLogMaxSize);
-// ÉèÖÃÈÕÖ¾µÈ¼¶
+// è®¾ç½®æ—¥å¿—ç­‰çº§
 void SetLogLevel(int iLogLevel);
-// ÉèÖÃÈÕÖ¾Â·¾¶
+// è®¾ç½®æ—¥å¿—è·¯å¾„
 void SetLogPath(const char *pLogPath);
-// ÉèÖÃÈÕÖ¾Ãû³Æ
+// è®¾ç½®æ—¥å¿—åç§°
 void SetLogFileName(const char *pLogFileName);
-// ÈÕÖ¾ÖØÃüÃû
+// æ—¥å¿—é‡å‘½å
 void SetNewLogFileName(char *pLogFileName, char *pMsgId=NULL);
-// ÖØÖÃÈÕÖ¾Ãû³Æ
+// é‡ç½®æ—¥å¿—åç§°
 void ReSetLogFileName();
-// ÉèÖÃ´íÎóÈÕÖ¾
+// è®¾ç½®é”™è¯¯æ—¥å¿—
 void SetErrLogFile(const char *pErrLogFile);
-// Ğ´ÈÕÖ¾º¯Êı
+// å†™æ—¥å¿—å‡½æ•°
 void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* errcode, const char* format...);
-// µ÷ÓÃºê
+// è°ƒç”¨å®
 #define Trace(level, errcode, fmt, ...) _Trace(__FILE__, __LINE__, (level), (errcode), (fmt), ##__VA_ARGS__)
 
 #endif

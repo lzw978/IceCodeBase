@@ -1,11 +1,11 @@
 /********************************************************************
-Œƒº˛√˚£∫logger.cpp
-¥¥Ω®»À£∫lzw978
-»’  ∆⁄£∫2017-08-08
-–ﬁ∏ƒ»À£∫
-»’  ∆⁄£∫
-√Ë   ˆ£∫º«¬º»’÷æ
-∞Ê  ±æ£∫
+Êñá‰ª∂ÂêçÔºölogger.cpp
+ÂàõÂª∫‰∫∫Ôºölzw978
+Êó•  ÊúüÔºö2017-08-08
+‰øÆÊîπ‰∫∫Ôºö
+Êó•  ÊúüÔºö
+Êèè  Ëø∞ÔºöËÆ∞ÂΩïÊó•Âøó
+Áâà  Êú¨Ôºö
 ********************************************************************/
 
 #include <string>
@@ -25,23 +25,18 @@ using namespace std;
 
 #include "logger.h"
 
-#define LOG_BUF 1024*1024*3   // »’÷æª∫¥Ê«¯¥Û–°,ƒ¨»œ3M
+#define LOG_BUF 1024*1024*3   // Êó•ÂøóÁºìÂ≠òÂå∫Â§ßÂ∞è,ÈªòËÆ§3M
 
-int  g_iMaxFileSize = 0;      // »’÷æ◊Ó¥Û»›¡ø
-char g_szLogPath[100];        // »’÷æ¬∑æ∂
-char g_szLogFileName[35];     // »’÷æ√˚≥∆
-char g_szLogFileNameOld[35];  // æ…»’÷æ√˚≥∆
-int  g_iLogLevel;             // »’÷æµ»º∂
-char g_szMsgId[30+1];         // œ˚œ¢ID÷µ
-char g_szErrLogFile[300];     // ¥ÌŒÛ»’÷æ
-char *g_szTmpG;               // ¥Ú”°–≈œ¢
+int  g_iMaxFileSize = 0;      // Êó•ÂøóÊúÄÂ§ßÂÆπÈáè
+char g_szLogPath[100];        // Êó•ÂøóË∑ØÂæÑ
+char g_szLogFileName[35];     // Êó•ÂøóÂêçÁß∞
+char g_szLogFileNameOld[35];  // ÊóßÊó•ÂøóÂêçÁß∞
+int  g_iLogLevel;             // Êó•ÂøóÁ≠âÁ∫ß
+char g_szMsgId[30+1];         // Ê∂àÊÅØIDÂÄº
+char g_szErrLogFile[300];     // ÈîôËØØÊó•Âøó
+char *g_szTmpG;               // ÊâìÂç∞‰ø°ÊÅØ
 
-string g_strErrLogFilePath;   // ¥ÌŒÛ»’÷æ¬∑æ∂
-string g_strErrLogFileName;   // ¥ÌŒÛ»’÷æ√˚≥∆
-string g_strErrLogFileExt;    // ¥ÌŒÛ»’÷æ¿©’π√˚
-
-
-// ªÒ»°µ±«∞œµÕ≥ ±º‰
+// Ëé∑ÂèñÂΩìÂâçÁ≥ªÁªüÊó∂Èó¥
 char* GetErrTime()
 {
     struct timeval  tp;
@@ -59,7 +54,7 @@ char* GetErrTime()
     return szErrTime;
 }
 
-// ªÒ»°»’÷æ ±º‰¬∑æ∂
+// Ëé∑ÂèñÊó•ÂøóÊó∂Èó¥Ë∑ØÂæÑ
 const char* GetLOGTimePath(char* lpBuf, char* lpTime)
 {
     struct timeval  tp;
@@ -83,7 +78,7 @@ const char* GetLOGTimePath(char* lpBuf, char* lpTime)
     return lpBuf;
 }
 
-// ≈–∂œ»’÷æ «∑Ò“—æ≠¥Ê‘⁄
+// Âà§Êñ≠Êó•ÂøóÊòØÂê¶Â∑≤ÁªèÂ≠òÂú®
 bool LOGFileExist(const string& sFileName)
 {
 #ifdef WIN32
@@ -101,7 +96,7 @@ bool LOGFileExist(const string& sFileName)
     return true;
 }
 
-// ∑µªÿ»’÷æ¥Û–°
+// ËøîÂõûÊó•ÂøóÂ§ßÂ∞è
 long LOGFileSize(const string& sFileName)
 {
     struct stat  FileStat;
@@ -121,7 +116,7 @@ long LOGFileSize(const string& sFileName)
     return FileStat.st_size;
 }
 
-// ≈–∂œ»’÷æ «∑ÒŒ™utf8±‡¬Î
+// Âà§Êñ≠Êó•ÂøóÊòØÂê¶‰∏∫utf8ÁºñÁ†Å
 bool IsUTF8ToLOG(const void* pBuffer, long size)
 {
     bool IsUTF8 = true;
@@ -182,20 +177,20 @@ bool IsUTF8ToLOG(const void* pBuffer, long size)
     return IsUTF8;
 }
 
-// ¥¥Ω®»’÷æ¬∑æ∂
+// ÂàõÂª∫Êó•ÂøóË∑ØÂæÑ
 bool CreatePathDir(const char* lpPathName)
 {
-    //»∑±£ ‰»Î≤Œ ˝’˝»∑
+    //Á°Æ‰øùËæìÂÖ•ÂèÇÊï∞Ê≠£Á°Æ
     if(NULL == lpPathName || 0 == strlen(lpPathName))
     {
         return false;
     }
 
-    char    szPath[1024]    = { 0 };  //¬∑æ∂¡Ÿ ±ª∫≥Â«¯
+    char    szPath[1024]    = { 0 };  //Ë∑ØÂæÑ‰∏¥Êó∂ÁºìÂÜ≤Âå∫
     char    cSeparator              = '/';
     int     nLen;
 
-    //ƒø¬º√˚÷–≤ª”√”⁄≥ˆœ÷µƒ◊÷∑˚
+    //ÁõÆÂΩïÂêç‰∏≠‰∏çÁî®‰∫éÂá∫Áé∞ÁöÑÂ≠óÁ¨¶
     strncpy(szPath, lpPathName, sizeof(szPath) - 1);
     nLen = strlen(szPath);
 
@@ -205,44 +200,44 @@ bool CreatePathDir(const char* lpPathName)
         {
             cSeparator = szPath[i];
 
-            szPath[i] = 0;    //…Ë÷√◊÷∑˚¥ÆΩ· ¯∑˚
+            szPath[i] = 0;    //ËÆæÁΩÆÂ≠óÁ¨¶‰∏≤ÁªìÊùüÁ¨¶
 
-            //‘⁄¥¥Ω®∂‡º∂ƒø¬º ±£¨»Áπ˚ƒø¬º“—¥Ê‘⁄£¨‘Ú≤ª»œŒ™ «¥ÌŒÛ£¨
-            //ºÃ–¯¥¥Ω®œ¬“ªº∂ƒø¬º£ª»Áπ˚¥¥Ω®ƒø¬º ß∞‹£¨µ´ ß∞‹‘≠“Ú
-            //≤¢≤ª «ƒø¬º“—¥Ê‘⁄£¨‘Ú÷’÷π¥¥Ω®£¨∫Ø ˝∑µªÿFALSE°£
+            //Âú®ÂàõÂª∫Â§öÁ∫ßÁõÆÂΩïÊó∂ÔºåÂ¶ÇÊûúÁõÆÂΩïÂ∑≤Â≠òÂú®ÔºåÂàô‰∏çËÆ§‰∏∫ÊòØÈîôËØØÔºå
+            //ÁªßÁª≠ÂàõÂª∫‰∏ã‰∏ÄÁ∫ßÁõÆÂΩïÔºõÂ¶ÇÊûúÂàõÂª∫ÁõÆÂΩïÂ§±Ë¥•Ôºå‰ΩÜÂ§±Ë¥•ÂéüÂõ†
+            //Âπ∂‰∏çÊòØÁõÆÂΩïÂ∑≤Â≠òÂú®ÔºåÂàôÁªàÊ≠¢ÂàõÂª∫ÔºåÂáΩÊï∞ËøîÂõûFALSE„ÄÇ
             mode_t mMode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 
             if ((mkdir(szPath, mMode) == -1) && (errno != EEXIST))
             {
                 return false;
             }
-            szPath[i] = cSeparator;  //ª÷∏¥◊÷∑˚¥Æ
+            szPath[i] = cSeparator;  //ÊÅ¢Â§çÂ≠óÁ¨¶‰∏≤
         }
     }
 
     return true;
 }
 
-// …Ë÷√»’÷æ¥Û–°
+// ËÆæÁΩÆÊó•ÂøóÂ§ßÂ∞è
 void SetLogMaxSize(int iLogMaxSize)
 {
     g_iMaxFileSize = iLogMaxSize;
 }
 
-// …Ë÷√»’÷æµ»º∂
+// ËÆæÁΩÆÊó•ÂøóÁ≠âÁ∫ß
 void SetLogLevel(int iLogLevel)
 {
     g_iLogLevel = iLogLevel;
 }
 
-// …Ë÷√»’÷æ¬∑æ∂
+// ËÆæÁΩÆÊó•ÂøóË∑ØÂæÑ
 void SetLogPath(const char *pLogPath)
 {
     strcpy(g_szLogPath, pLogPath);
     g_szTmpG = new char[LOG_BUF];
 }
 
-// …Ë÷√»’÷æ√˚≥∆
+// ËÆæÁΩÆÊó•ÂøóÂêçÁß∞
 void SetLogFileName(const char *pLogFileName)
 {
     strcpy(g_szLogFileName, pLogFileName);
@@ -250,7 +245,7 @@ void SetLogFileName(const char *pLogFileName)
     memset(g_szMsgId, 0, sizeof(g_szMsgId));
 }
 
-// …Ë÷√»’÷æ–¬√˚≥∆
+// ËÆæÁΩÆÊó•ÂøóÊñ∞ÂêçÁß∞
 void SetNewLogFileName(char *pLogFileName, char *pMsgId)
 {
     memset(g_szMsgId, 0, sizeof(g_szMsgId));
@@ -263,34 +258,20 @@ void SetNewLogFileName(char *pLogFileName, char *pMsgId)
         strcpy(g_szMsgId, pMsgId);
 }
 
-// ÷ÿ÷√»’÷æ√˚≥∆
+// ÈáçÁΩÆÊó•ÂøóÂêçÁß∞
 void ReSetLogFileName()
 {
     strcpy(g_szLogFileName, g_szLogFileNameOld);
     memset(g_szMsgId, 0, sizeof(g_szMsgId));
 }
 
-// …Ë÷√¥ÌŒÛ»’÷æ
+// ËÆæÁΩÆÈîôËØØÊó•Âøó
 void SetErrLogFile(const char *pErrLogFile)
 {
     strcpy(g_szErrLogFile, pErrLogFile);
-
-    int iIdxStart = 0;
-    int iIdxEnd = 0;
-    
-    string strErrLogPathName = pErrLogFile;
-    iIdxStart = strErrLogPathName.find_last_of('/');
-    iIdxEnd = strErrLogPathName.find_last_of('.');
-    
-    if(iIdxStart * iIdxEnd > 0)
-    {
-        g_strErrLogFilePath = strErrLogPathName.substr(0,iIdxStart+1);
-        g_strErrLogFileName = strErrLogPathName.substr(iIdxStart+1,iIdxEnd-iIdxStart-1);
-        g_strErrLogFileExt = strErrLogPathName.substr(iIdxEnd);
-    }
 }
 
-// »’÷æ¥Ú”°∫Ø ˝
+// Êó•ÂøóÊâìÂç∞ÂáΩÊï∞
 void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* errcode, const char* format...)
 {
     string sPath         = "";
@@ -301,6 +282,7 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* e
     char szMonth[2 + 1]  = { 0 };
     char szToday[2 + 1]  = { 0 };
     string strFile       = "";
+    string strErrFile    = "";
     FILE* logFile;
 
     if(level > g_iLogLevel)
@@ -308,7 +290,7 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* e
         return;
     }
 
-    // ≥ı ºªØ»’÷æª∫¥Ê
+    // ÂàùÂßãÂåñÊó•ÂøóÁºìÂ≠ò
     memset(g_szTmpG, 0, LOG_BUF);
 
     va_list argList;
@@ -316,25 +298,30 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* e
     vsnprintf(g_szTmpG, LOG_BUF, format, argList);
     va_end(argList);
 
-    //»°µ±«∞œµÕ≥»’∆⁄£¨»Á20090909
+    //ÂèñÂΩìÂâçÁ≥ªÁªüÊó•ÊúüÔºåÂ¶Ç20090909
     GetLOGTimePath(szDate, szTime);
     memcpy(szYear, szDate, sizeof(szYear) - 1);
     memcpy(szMonth, szDate + 4, sizeof(szMonth) - 1);
     memcpy(szToday, szDate + 6, sizeof(szToday) - 1);
     szTime[23] = '\0';
 
-    //∫œ≥…¬∑æ∂
+    //ÂêàÊàêË∑ØÂæÑ
     strFile  = g_szLogPath;
     strFile += "/";
     strFile += szYear;
     strFile += szMonth;
     strFile += szToday;
 
-    //»’÷æŒƒº˛¬∑æ∂
+    //Êó•ÂøóÊñá‰ª∂Ë∑ØÂæÑ
     sPath = strFile;
     strFile += "/";
     strFile += g_szLogFileName;
     strFile += ".log";
+    //ÈîôËØØÊó•ÂøóÊñá‰ª∂Ë∑ØÂæÑ
+    strErrFile = sPath;
+    strErrFile += "/";
+    strErrFile += g_szErrLogFile;
+    strErrFile += ".log";
 
     switch(level)
     {
@@ -359,7 +346,7 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* e
 
     CreatePathDir(sPath.c_str());
 
-    // ≥¨π˝√ø∏ˆ»’÷æŒƒº˛◊Ó¥Û»›¡ø
+    // Ë∂ÖËøáÊØè‰∏™Êó•ÂøóÊñá‰ª∂ÊúÄÂ§ßÂÆπÈáè
     if (g_iMaxFileSize > 0)
     {
         struct stat stbuf;
@@ -369,7 +356,7 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* e
             if (stbuf.st_size >= g_iMaxFileSize)
             {
                 string strNewFile = "";
-                //∫œ≥…¬∑æ∂
+                //ÂêàÊàêË∑ØÂæÑ
                 strNewFile  = g_szLogPath;
                 strNewFile += "/";
                 strNewFile += szYear;
@@ -400,7 +387,6 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* e
         }
 
         fprintf(logFile, "[%07d|%11d|%s|%s|%30s|%06d|%7s]: %s\n", getpid(), (int)pthread_self(), szTime, g_szMsgId, szFileName, iFileLine, szErrType, g_szTmpG);
-
         fclose(logFile);
 
         if (L_ERROR == level)
@@ -408,38 +394,39 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* e
             if (NULL == errcode)
                 return;
 
-            // ≤‚ ‘∂ºº«¬º
+            // ÈîôËØØÈÉΩËÆ∞ÂΩï
             if (strlen(g_szErrLogFile) > 0)
             {
-                // ≥¨π˝√ø∏ˆ»’÷æŒƒº˛◊Ó¥Û»›¡ø
+                // Ë∂ÖËøáÊØè‰∏™Êó•ÂøóÊñá‰ª∂ÊúÄÂ§ßÂÆπÈáè
                 if (g_iMaxFileSize > 0)
                 {
                     struct stat stbuf;
-            
-                    if ( 0 == stat(g_szErrLogFile, &stbuf) ) 
+
+                    if ( 0 == stat(strErrFile.c_str(), &stbuf) )
                     {
                         if (stbuf.st_size >= g_iMaxFileSize)
                         {
                             string strNewFile = "";
-                            //∫œ≥…¬∑æ∂
-                            strNewFile  = g_strErrLogFilePath;
+
+                            strNewFile  = g_szLogPath;
                             strNewFile += "/";
-                            strNewFile += g_strErrLogFileName;
-                            strNewFile += ".";
-                            strNewFile += szDate;
+                            strNewFile += szYear;
+                            strNewFile += szMonth;
+                            strNewFile += szToday;
+                            strNewFile += "/";
+                            strNewFile += g_szErrLogFile;
                             strNewFile += ".";
                             strNewFile += szTime;
-                            strNewFile += g_strErrLogFileExt;
-                            
+                            strNewFile += ".log";
+
                             rename(g_szErrLogFile, strNewFile.c_str());
                         }
                     }
                 }
-                FILE *pError = fopen(g_szErrLogFile, "a+");
+                FILE *pError = fopen(strErrFile.c_str(), "a+");
                 if (NULL != pError)
                 {
                     fprintf(pError, "[%07d|%11d|%s%s|%s|%30.30s|%06d|%7s]: %s\n", getpid(), (int)pthread_self(), szDate, szTime, g_szMsgId, szFileName, iFileLine, szErrType, g_szTmpG);
-
                     fclose(pError);
                 }
             }
