@@ -28,6 +28,8 @@ public:
     RedisClient();
     virtual ~RedisClient();
 
+    // 选择数据库
+    bool SetDbNumber(int idbnum = 0);
     // 连接redis
     redisContext* connect(string ip, int port, int timeout = 2000);
     // 执行redis命令
@@ -36,8 +38,6 @@ public:
     redisReply* ExecuteCmd(const char *cmd);
     // 断开连接
     void disconnect();
-    // 设置数据库索引
-    bool SetDbNumber(int idbnum);
 
 private:
     int m_timeout;     // 超时时间
