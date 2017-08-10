@@ -19,18 +19,25 @@ RedisClient::RedisClient()
 
 RedisClient::~RedisClient()
 {
-    redisFree(m_pCtx);
+    if(m_pCtx != NULL)
+    {
+        redisFree(m_pCtx);
+        m_pCtx = NULL;
+    }
 }
 
 // 执行redis命令
 bool RedisClient::ExecuteCmd(const char *cmd, string &response)
 {
     redisReply *reply = ExecuteCmd(cmd);
-    if(reply == NULL) return false;
-
-    boost::shared_ptr<redisReply> autoFree(reply, freeReplyObject);
+    if(reply == NULL)
+        return false;
+    char svalue[32] = {0};
+    AutoFreeRedisReply AutoReply(reply);
     if(reply->type == REDIS_REPLY_INTEGER)
     {
+        sprintf(svalue, "%ld", reply->integer);
+        response = svalue;
         return true;
     }
     else if(reply->type == REDIS_REPLY_STRING)
@@ -71,7 +78,11 @@ redisReply* RedisClient::ExecuteCmd(const char *cmd)
     if(cmd == NULL) return NULL;
 
     redisReply *reply = (redisReply*)redisCommand(m_pCtx, cmd);
-
+    if(reply->type == REDIS_REPLY_ERROR)
+    {
+        freeReplyObject(reply);
+        return NULL;
+    }
     return reply;
 }
 
@@ -85,7 +96,7 @@ redisContext* RedisClient::connect(string ip, int port,int timeout)
 
     // 获取当前时间
     time_t now = time(NULL);
-    if(now < m_beginInvalidTime + m_maxReconnectInterval) 
+    if(now < m_beginInvalidTime + m_maxReconnectInterval)
         return NULL;
 
     struct timeval tv;
@@ -94,7 +105,7 @@ redisContext* RedisClient::connect(string ip, int port,int timeout)
     m_pCtx = redisConnectWithTimeout(m_setverIp.c_str(), m_serverPort, tv);
     if(m_pCtx == NULL || m_pCtx->err != 0)
     {
-        if(m_pCtx != NULL) 
+        if(m_pCtx != NULL)
             redisFree(m_pCtx);
 
         m_beginInvalidTime = time(NULL);
@@ -111,19 +122,46 @@ void RedisClient::ReleaseContext(redisContext *ctx, bool active)
     if(!active) {redisFree(m_pCtx); return;}
 }
 
+// 选择数据库
+bool RedisClient::SetDbNumber(int idbnum)
+{
+    char cmd[256]={0};
+    snprintf(cmd, sizeof(cmd), "SELECT %d",idbnum);
+
+    redisReply *reply = (redisReply*)redisCommand(m_pCtx, cmd);
+
+    AutoFreeRedisReply AutoReply(reply);
+    if(reply->type == REDIS_REPLY_ERROR)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 // 验证服务器状态
 bool RedisClient::CheckStatus(redisContext *ctx)
 {
     redisReply *reply = (redisReply*)redisCommand(m_pCtx, "ping");
     if(reply == NULL) return false;
 
-    boost::shared_ptr<redisReply> autoFree(reply, freeReplyObject);
+    AutoFreeRedisReply AutoReply(reply);
 
-    if(reply->type != REDIS_REPLY_STATUS) 
+    if(reply->type != REDIS_REPLY_STATUS)
         return false;
-    if(strcasecmp(reply->str,"PONG") != 0) 
+    if(strcasecmp(reply->str,"PONG") != 0)
         return false;
 
     return true;
 }
 
+// 断开连接
+void RedisClient::disconnect()
+{
+    if(m_pCtx != NULL)
+    {
+        redisFree(m_pCtx);
+        m_pCtx = NULL;
+    }
+    return ;
+}

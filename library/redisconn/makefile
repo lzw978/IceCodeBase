@@ -15,7 +15,7 @@ PATH_LIB = ../hiredis-vip
 CC=gcc
 CPP=g++
 DEBUG=-g
-CXXFLAGS=-m64 -O0 -fPIC 
+CXXFLAGS=-m64 -O0 -fPIC
 SHARE=-shared
 
 ##################头文件和依赖库##############################
@@ -31,7 +31,8 @@ LIB = -L$(BOOST_LIB) -L$(PATH_LIB) -lhiredis_vip
 ##################编译中间.o文件##############################
 VPATH = ./src:$(PATH_OBJ)
 LIBOBJ = \
-redisClient.o
+redisClient.o\
+redispool.o
 
 ##################固定########################################
 .SUFFIXES:

@@ -17,7 +17,6 @@
 #include <string>
 #include <iostream>
 #include <string.h>
-#include <boost/shared_ptr.hpp>
 #include <stdlib.h>
 #include "hiredis.h"
 
@@ -35,6 +34,10 @@ public:
     bool ExecuteCmd(const char *cmd, string &response);
     // 带返回结果的命令执行
     redisReply* ExecuteCmd(const char *cmd);
+    // 断开连接
+    void disconnect();
+    // 设置数据库索引
+    bool SetDbNumber(int idbnum);
 
 private:
     int m_timeout;     // 超时时间
@@ -52,6 +55,20 @@ private:
     bool CheckStatus(redisContext *ctx);
 };
 
-
+struct AutoFreeRedisReply
+{
+    redisReply* m_pReply;
+    AutoFreeRedisReply(redisReply* pReply)
+    {
+        m_pReply = pReply;
+    }
+    ~AutoFreeRedisReply()
+    {
+        if(m_pReply != NULL)
+        {
+            freeReplyObject(m_pReply);
+        }
+    }
+};
 #endif
 
