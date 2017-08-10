@@ -16,7 +16,7 @@
 #include <math.h>
 #include <time.h>
 #include <errno.h>
-#include "datetime.hpp"
+#include "datetime.h"
 
 using namespace std;
 using namespace commbase;

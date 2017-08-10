@@ -23,7 +23,9 @@ LIB =
 
 ##################编译中间.o文件##############################
 VPATH = ./src:$(PATH_OBJ)
-LIBOBJ = ShareMemory.o
+LIBOBJ = ShareMemory.o\
+         datetime.o\
+         apppubfunc.o
 
 ##################固定########################################
 .SUFFIXES:
