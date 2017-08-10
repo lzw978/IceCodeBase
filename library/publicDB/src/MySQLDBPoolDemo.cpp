@@ -1,19 +1,19 @@
 /*
  * =====================================================================================
  *
- *       Filename:  MySQLDBPool.cpp
+ *       Filename:  MySQLDBPoolDemo.cpp
  *
- *    Description:  test logger
+ *    Description:  test use mysql conn
  *
  *        Version:  1.0
  *        Created:  08/09/17 02:11:35
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  YOUR NAME (lzw978), 
- *   Organization:  
+ *         Author:  YOUR NAME (lzw978),
+ *   Organization:
  *   编译src目录下执行：
- *   g++ -g -o MYDEMO -I../include -L../ -lPubDB MySQLDBPoolDemo.cpp 
+ *   g++ -g -o MYDEMO -I../include -L../ -lPubDB MySQLDBPoolDemo.cpp
  * =====================================================================================
  */
 
