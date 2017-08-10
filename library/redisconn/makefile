@@ -19,14 +19,11 @@ CXXFLAGS=-m64 -O0 -fPIC
 SHARE=-shared
 
 ##################头文件和依赖库##############################
-#依赖boost和开源hiredis-vip，需要先安装修改依赖路径才能编译
+#依赖开源hiredis-vip
 INC_HIREDIS=../hiredis-vip
-BOOST_ROOT=/usr/local/boost
-BOOST_INC=$(BOOST_ROOT)/include
-BOOST_LIB=$(BOOST_ROOT)/lib
 
-INC = -I$(BOOST_INC) -I$(PATH_PRJ)/include -I$(INC_HIREDIS)
-LIB = -L$(BOOST_LIB) -L$(PATH_LIB) -lhiredis_vip
+INC = -I$(PATH_PRJ)/include -I$(INC_HIREDIS)
+LIB = -L$(PATH_LIB) -lhiredis_vip
 
 ##################编译中间.o文件##############################
 VPATH = ./src:$(PATH_OBJ)
