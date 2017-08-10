@@ -26,16 +26,17 @@
 #include <pthread.h>
 
 #define INVALID_SHAREMEM_HANDLE -1
+#define SHM_DEFAULT_SIZE        1024*64 // 默认64k
 
 class CShareMemory
 {
 public:
     CShareMemory(void);
-    CShareMemory(const char* pszName, int nSize);
+    CShareMemory(const char* pszName, int nSize = SHM_DEFAULT_SIZE);
     ~CShareMemory();
 
-    // 创建共享内存
-    int Create(const char* pszName, int nSize);
+    // 创建共享内存(返回共享内存句柄)
+    int Create(const char* pszName, int nSize = SHM_DEFAULT_SIZE);
     // 销毁已经创建的共享内存
     void Destroy(void);
     // 创建是否已创建的共享内存对象
@@ -48,10 +49,12 @@ public:
     bool LockShareMemory(bool bWriteLock);
     // 解锁：解除对共享内存的,允许其它进程访问
     void UnlockShareMemory(void);
+
+    int   m_hShareMemHandle;        // 共享内存句柄
+
 private:
     bool  m_bExistFlag;             // 标识共享内存实例创建前，是否已经存在
     int   m_nSize;                  // 共享内存大小
-    int   m_hShareMemHandle;        // 共享内存句柄
     char  m_szShareMemName[256+1];  // 共享内存名字
     void* m_pMemory;                // 指向共享内存区域的指针
 };

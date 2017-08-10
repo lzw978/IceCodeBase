@@ -48,7 +48,7 @@ int CShareMemory::Create(const char* pszName, int nSize)
     strncpy(&m_szShareMemName[1], pszName, sizeof(m_szShareMemName)-2);
 
     // 替换共享内存名称中的'/'为'_'
-    for(int i=0; m_szShareMemName[i]!=0; ++i)
+    for(int i=1; m_szShareMemName[i] != 0; ++i)
     {
         if(m_szShareMemName[i] == '/')
         {
@@ -195,7 +195,7 @@ bool CShareMemory::LockShareMemory(bool bWriteLock)
     }
     sLocking.l_whence = SEEK_SET;
     sLocking.l_start  = 0;
-    sLocking.l_len     = m_nSize;
+    sLocking.l_len    = m_nSize;
     int nRet = fcntl(m_hShareMemHandle, F_SETLK, &sLocking);
     return (nRet == 0);
 }
