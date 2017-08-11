@@ -1,0 +1,2 @@
+该目录文件来源于rocketmq-client4cpp下的include目录
+编译相关程序先编译安装rocketmq-client4cpp相关库
