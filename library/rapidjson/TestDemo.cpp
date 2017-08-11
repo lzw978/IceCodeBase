@@ -66,11 +66,11 @@ int main(int argc, char *argv[])
     parseJsonMsg.Parse<0>(result.c_str());
     Value &rootName = parseJsonMsg["name"];
     Value &rootAddr = parseJsonMsg["address"];
-    Value &rootage  = parseJsonMsg["age"];
+    Value &rootAge  = parseJsonMsg["age"];
     Value &rootArray= parseJsonMsg["data"];
     cout << "name = " << rootName.GetString() << endl;
     cout << "addr = " << rootAddr.GetString() << endl;
-    cout << "age  = " << rootage.GetString()  << endl;
+    cout << "age  = " << rootAge.GetString()  << endl;
 
     if( rootArray.IsArray())
     {
@@ -87,7 +87,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-
 
     return 0;
 }
