@@ -10,9 +10,9 @@
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  YOUR NAME (lzw978), 
- *   Organization:  
- *   目录下执行编译：g++ -g -o MAIN TestDemo.cpp 
+ *         Author:  YOUR NAME (lzw978),
+ *   Organization:
+ *   目录下执行编译：g++ -g -o JsonDemo TestDemo.cpp
  * =====================================================================================
  */
 #include <stdio.h>
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     root.AddMember("age", "20", allocator);
 
     // 增加数组
-    for(int i=0;i<5;++i)
+    for(int i=0;i<2;++i)
     {
         Value object(kObjectType);
         object.AddMember("id", i, allocator);
@@ -59,6 +59,35 @@ int main(int argc, char *argv[])
     string result = buffer.GetString();
 
     cout << "result :" << result << " size=: " << result.size() << endl;
+
+
+    // 解析测试
+    Document parseJsonMsg;
+    parseJsonMsg.Parse<0>(result.c_str());
+    Value &rootName = parseJsonMsg["name"];
+    Value &rootAddr = parseJsonMsg["address"];
+    Value &rootage  = parseJsonMsg["age"];
+    Value &rootArray= parseJsonMsg["data"];
+    cout << "name = " << rootName.GetString() << endl;
+    cout << "addr = " << rootAddr.GetString() << endl;
+    cout << "age  = " << rootage.GetString()  << endl;
+
+    if( rootArray.IsArray())
+    {
+        for(int i=0; i< rootArray.Size(); ++i)
+        {
+            Value &arrValue = rootArray[i];
+            if(arrValue.HasMember("id") && arrValue["id"].IsString())
+            {
+                cout << "id = " << arrValue["id"].GetString() << endl;
+            }
+            if(arrValue.HasMember("class") && arrValue["class"].IsString())
+            {
+                cout << "class = " << arrValue["class"].GetString() << endl;
+            }
+        }
+    }
+
 
     return 0;
 }
