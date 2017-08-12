@@ -34,11 +34,6 @@ public:
     TConfigBase();
     virtual ~TConfigBase();
 
-    // 加载配置文件(ini格式)
-    int LoadIniFile(string sPathName);
-    // 加载配置文件(xml格式)
-    //int LoadXmlFile(string sPathName);
-
     // 根据tag值获取参数值
     string GetTagValue(string strSection, string strKey, string strDef = "");
     int GetTagValue(string strSection, string strKey, int iDef = 0);
@@ -46,6 +41,11 @@ public:
     // 根据tag值设置参数值
     string SetTagValue(string strSection, string strKey, string strDef = "");
     int SetTagValue(string strSection, string strKey, int iDef = 0);
+
+    // 加载配置文件(ini格式)
+    int LoadIniFile(string sPathName);
+    // 加载配置文件(xml格式)
+    int LoadXmlFile(string sPathName);
 protected:
     // 参数值Map
     MAP_SECTIONS m_mapSections;
