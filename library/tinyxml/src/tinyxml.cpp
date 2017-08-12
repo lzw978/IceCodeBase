@@ -10,7 +10,7 @@
 版  本：
 ********************************************************************/
 
-#include "txml.h"
+#include "tinyxml.h"
 
 const unsigned char TIXML_UTF_LEAD_0 = 0xefU;
 const unsigned char TIXML_UTF_LEAD_1 = 0xbbU;
