@@ -72,3 +72,57 @@ char* GetCurrTime(int iFormat)
 
     return szCurrTime;
 }
+
+// 去除当前空格
+char* Trim(char* pszStr)
+{
+    if( NULL == pszStr)
+    {
+        return NULL;
+    }
+    if( 0 == pszStr[0])
+    {
+        return pszStr;
+    }
+    // 去掉字符串头部的空格、水平制表符、回车换行符
+    char* pszTmp = pszStr;
+    while((*pszTmp == ' ') || (*pszTmp == '\t') || (*pszTmp == '\r') || (*pszTmp == '\n'))
+    {
+        pszTmp++;
+    }
+    // 去掉字符串尾部的空格、水平制表符、回车换行符
+    unsigned int nLen = strlen(pszTmp);
+    while( (nLen>0) && ((pszTmp[nLen-1] == ' ') || (pszTmp[nLen-1] == '\t')|| (pszTmp[nLen-1] == '\r') || (pszTmp[nLen-1] == '\n')))
+    {
+        nLen--;
+    }
+    pszTmp[nLen] = '\0';
+    memmove(pszStr, pszTmp, nLen+1);
+
+    return pszStr;
+}
+string Trim(string& strStr)
+{
+    if( strStr.length() <= 0 )
+    {
+        return strStr;
+    }
+    // 去掉字符串头部的空格、水平制表符、回车换行符
+    string::size_type nBeginPos = 0;
+    const char* lpTmp = strStr.c_str();
+    while((*lpTmp == ' ') || (*lpTmp == '\t') || (*lpTmp == '\r') || (*lpTmp == '\n'))
+    {
+        nBeginPos++;
+        lpTmp++;
+    }
+    // 去掉字符串尾部的空格、水平制表符、回车换行符
+    string::size_type nLen = strlen(lpTmp);
+    while((nLen>0) &&((lpTmp[nLen-1] == ' ') || (lpTmp[nLen-1] == '\t') || (lpTmp[nLen-1] == '\r') || (lpTmp[nLen-1] == '\n')))
+    {
+        nLen--;
+    }
+    strStr.erase(0, nBeginPos);
+    strStr.erase(nLen);
+
+    return strStr;
+}

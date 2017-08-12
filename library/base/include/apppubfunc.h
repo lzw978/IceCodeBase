@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <time.h>
 #include <sys/time.h>
 
@@ -34,14 +35,12 @@ enum TimeFormat
 	eDateTime14  = 23   // yyyymmddHHMISS
 };
 
-/********************************************************************
-功    能：获取当前时间
-输    入：iFormat,时间格式（取值参见枚举TimeFormat）
-成功返回：当前时间
-失败返回：无
-********************************************************************/
+// 获取当前时间（取值格式参见TimeFormat枚举)
 char* GetCurrTime(int iFormat);
 
+// 字符串去空格
+char* Trim(char* pszStr);
+string Trim(string& strStr);
 
 #endif
 
