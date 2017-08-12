@@ -1,14 +1,13 @@
 /********************************************************************
-文件名：txml.cpp
-创建人：wangbin
-日  期：2012-12-27
+文件名：tinyxml.cpp
+创建人：
+日  期：2017-08-11
 修改人：
 日  期：
 描  述：XML解析类
-性  能：(PC虚拟机,2000条明细,3.5M大小)解析:4秒;创建:0.8秒
+性  能：
 备  注：www.sourceforge.net/projects/tinyxml 根据tinyxml_2_6_2.zip修改
 版  本：
-Copyright (c) 2013 XING
 ********************************************************************/
 
 #include "txml.h"
@@ -40,8 +39,6 @@ TiXmlBase::Entity TiXmlBase::entity[ TiXmlBase::NUM_ENTITY ] =
 //              ef bb bf (Microsoft "lead bytes")
 //              ef bf be
 //              ef bf bf
-
-
 const int TiXmlBase::utf8ByteTable[256] =
 {
     //  0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f
@@ -211,18 +208,10 @@ void TiXmlBase::ConvertUTF32ToUTF8( unsigned long input, char* output, int* leng
     // letter. I'm not sure this is the best approach, but it is quite tricky trying
     // to figure out alhabetical vs. not across encoding. So take a very
     // conservative approach.
-
-//  if ( encoding == TIXML_ENCODING_UTF8 )
-//  {
-        if ( anyByte < 127 )
-            return isalpha( anyByte );
-        else
-            return 1;   // What else to do? The unicode set is huge...get the english ones right.
-//  }
-//  else
-//  {
-//      return isalpha( anyByte );
-//  }
+    if ( anyByte < 127 )
+        return isalpha( anyByte );
+    else
+        return 1;   // What else to do? The unicode set is huge...get the english ones right.
 }
 
 
@@ -232,18 +221,10 @@ void TiXmlBase::ConvertUTF32ToUTF8( unsigned long input, char* output, int* leng
     // letter. I'm not sure this is the best approach, but it is quite tricky trying
     // to figure out alhabetical vs. not across encoding. So take a very
     // conservative approach.
-
-//  if ( encoding == TIXML_ENCODING_UTF8 )
-//  {
-        if ( anyByte < 127 )
-            return isalnum( anyByte );
-        else
-            return 1;   // What else to do? The unicode set is huge...get the english ones right.
-//  }
-//  else
-//  {
-//      return isalnum( anyByte );
-//  }
+    if ( anyByte < 127 )
+        return isalnum( anyByte );
+    else
+        return 1;   // What else to do? The unicode set is huge...get the english ones right.
 }
 
 const char* TiXmlBase::SkipWhiteSpace( const char* p, TiXmlEncoding encoding )
@@ -296,7 +277,7 @@ const char* TiXmlBase::SkipWhiteSpace( const char* p, TiXmlEncoding encoding )
     return p;
 }
 
-/*static*/ bool TiXmlBase::StreamWhiteSpace( std::istream * in, string * tag )
+bool TiXmlBase::StreamWhiteSpace( std::istream * in, string * tag )
 {
     for( ;; )
     {
@@ -311,7 +292,7 @@ const char* TiXmlBase::SkipWhiteSpace( const char* p, TiXmlEncoding encoding )
     }
 }
 
-/*static*/ bool TiXmlBase::StreamTo( std::istream * in, int character, string * tag )
+bool TiXmlBase::StreamTo( std::istream * in, int character, string * tag )
 {
     //assert( character > 0 && character < 128 );   // else it won't work in utf-8
     while ( in->good() )
@@ -511,10 +492,7 @@ const char* TiXmlBase::ReadText(    const char* p,
                                     bool caseInsensitive,
                                     TiXmlEncoding encoding )
 {
-    // add by wangbin, 2013-04-04, 不能修改XML本身的数据
     trimWhiteSpace = false;
-    // end mod
-
     *text = "";
     if (    !trimWhiteSpace         // certain tags always keep whitespace
          || !condenseWhiteSpace )   // if true, whitespace is always kept
@@ -1347,7 +1325,6 @@ void TiXmlElement::ToXML( string &sMsg, int depth )
         sMsg += ">";
     }
 
-    //printf("TiXmlElement:sMsg[%s]\n", sMsg.c_str());
 }
 
 
@@ -1675,9 +1652,6 @@ const char* TiXmlElement::ReadValue( const char* p, TiXmlParsingData* data, TiXm
 
     // Read in text and elements in any order.
     const char* pWithWhiteSpace = p;
-    // del by wangbin, 2013-04-04, 不能修改XML本身的数据
-    //p = SkipWhiteSpace( p, encoding );
-    // end del
 
     while ( p && *p )
     {
@@ -1702,12 +1676,7 @@ const char* TiXmlElement::ReadValue( const char* p, TiXmlParsingData* data, TiXm
                 p = textNode->Parse( pWithWhiteSpace, data, encoding );
             }
 
-            // mod by wangbin, 2013-04-04, 不能修改XML本身的数据
-            //if ( !textNode->Blank() )
             LinkEndChild( textNode );
-            //else
-            //  delete textNode;
-            // end mod
         }
         else
         {
@@ -1993,8 +1962,6 @@ TiXmlNode* TiXmlDocument::Clone() const
 void TiXmlDocument::ToXML( string &sMsg, int depth )
 {
     // 保证XML初始为空
-    //sMsg = "";
-
     if ( useMicrosoftBOM )
     {
         sMsg += TIXML_UTF_LEAD_0;
@@ -2008,8 +1975,6 @@ void TiXmlDocument::ToXML( string &sMsg, int depth )
         node->ToXML( sMsg, depth );
         //fprintf( cfile, "\n" );
         sMsg += "\n";
-
-        //printf("sMsg[%s]\n", sMsg.c_str());
     }
 }
 
@@ -2022,17 +1987,6 @@ const TiXmlAttribute* TiXmlAttribute::Next() const
     return next;
 }
 
-/*
-TiXmlAttribute* TiXmlAttribute::Next()
-{
-    // We are using knowledge of the sentinel. The sentinel
-    // have a value or name.
-    if ( next->value.empty() && next->name.empty() )
-        return 0;
-    return next;
-}
-*/
-
 const TiXmlAttribute* TiXmlAttribute::Previous() const
 {
     // We are using knowledge of the sentinel. The sentinel
@@ -2042,16 +1996,6 @@ const TiXmlAttribute* TiXmlAttribute::Previous() const
     return prev;
 }
 
-/*
-TiXmlAttribute* TiXmlAttribute::Previous()
-{
-    // We are using knowledge of the sentinel. The sentinel
-    // have a value or name.
-    if ( prev->value.empty() && prev->name.empty() )
-        return 0;
-    return prev;
-}
-*/
 
 void TiXmlAttribute::ToXML( string &sMsg, int depth )
 {
