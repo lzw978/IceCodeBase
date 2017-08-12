@@ -242,7 +242,7 @@ int TConfigBase::LoadXmlFile(string sPathName)
     }
 
     // 根节点
-    TiXmlElement *pRootElement = docPrase.RootElement();
+    TiXmlElement *pRootElement = docParse.RootElement();
     if( NULL == pRootElement)
     {
         printf("Parse file failed.[%s]\n", docPrase.ErrorDesc());
@@ -270,10 +270,10 @@ int TConfigBase::LoadXmlFile(string sPathName)
         }
 
         // 解析部件
-        for( TiXmlAttribute* a = pSectionElement->FirstAttrbute(); a; a= a->Next())
+        for( TiXmlAttribute* a = pSectionElement->FirstAttribute(); a; a= a->Next())
         {
             sAttributeName = a->Name();
-            Trim(sAttrbuteName);
+            Trim(sAttributeName);
 
             if( TAG_NAME == sAttributeName)
             {
@@ -287,7 +287,7 @@ int TConfigBase::LoadXmlFile(string sPathName)
 
         if( "" == sSection)
         {
-            pSectionElement = pSectionElement->NextSibingElement();
+            pSectionElement = pSectionElement->NextSiblingElement();
             continue;
         }
 
@@ -331,16 +331,16 @@ int TConfigBase::LoadXmlFile(string sPathName)
 
                     if( TAG_OPTION != sOption)
                     {
-                        sTmpElement = pTmpElement->NextsiblingElement();
+                        pTmpElement = pTmpElement->NextSiblingElement();
                         continue;
                     }
 
-                    for(TiXmlAttribute* a = pTmpElement->FirstAttribute(); a; a->Next())
+                    for(TiXmlAttribute* a = pTmpElement->FirstAttribute(); a; a=a->Next())
                     {
                         sAttributeName = a->Name();
                         Trim(sAttributeName);
 
-                        if( TAG_NAMEE == sAttributeName)
+                        if( TAG_NAME == sAttributeName)
                         {
                             sTag = a->Value();
                             if( "" != sTag)
@@ -370,7 +370,7 @@ int TConfigBase::LoadXmlFile(string sPathName)
             }
             else
             {
-                for( TiXmlAttribute* a = pOptionElement->FirstAttribute(); a; a->Next())
+                for( TiXmlAttribute* a = pOptionElement->FirstAttribute(); a; a = a->Next())
                 {
                     sAttributeName = a->Name();
                     Trim(sAttributeName);
@@ -397,7 +397,7 @@ int TConfigBase::LoadXmlFile(string sPathName)
             }
             pOptionElement = pOptionElement->NextSiblingElement();
         }
-        m_mapSection.insert(make_pair<string, MAP_KEYVALS>(sSecting, mapKeyVals));
+        m_mapSection.insert(make_pair<string, MAP_KEYVALS>(sSection, mapKeyVals));
         pSectionElement = pSectionElement->NextSiblingElement();
     }
 
