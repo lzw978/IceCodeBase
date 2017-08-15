@@ -26,6 +26,10 @@ typedef map<string, string> MAP_KEYVALS;
 typedef map<string, MAP_KEYVALS> MAP_SECTIONS;
 
 #define MAX_CONFIG_LEN  1024*32
+#define TAG_SECTION "Section"
+#define TAG_OPTION  "Option"
+#define TAG_NAME    "name"
+#define TAG_PID     "PID"
 #define DEFAULT_SECTION "XXXXXXXXXXXXXX"
 
 class TConfigBase

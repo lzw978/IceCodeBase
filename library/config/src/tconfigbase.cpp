@@ -46,7 +46,7 @@ string TConfigBase::GetTagValue(string strSection, string strKey, string strDef)
         return strDef;
     }
     // 查询子级节点key，获取value值
-    MAP_SECTIONS::iterator itKeyVal = itSection->second.find(strKey);
+    MAP_KEYVALS::iterator itKeyVal = itSection->second.find(strKey);
     if( itKeyVal == itSection->second.end())
     {
         return strDef;
@@ -69,7 +69,7 @@ int TConfigBase::GetTagValue(string strSection, string strKey, int iDef)
         return iDef;
     }
     // 查询子级节点key，获取value值
-    MAP_SECTIONS::iterator itKeyVal = itSection->second.find(strKey);
+    MAP_KEYVALS::iterator itKeyVal = itSection->second.find(strKey);
     if( itKeyVal == itSection->second.end())
     {
         return iDef;
@@ -94,14 +94,14 @@ string TConfigBase::SetTagValue(string strSection, string strKey, string strDef)
         return strDef;
     }
     // 根据子级节点名key设置value
-    MAP_SECTIONS::iterator itKeyVal = itSection->second.find(strKey);
+    MAP_KEYVALS::iterator itKeyVal = itSection->second.find(strKey);
     if( itKeyVal == itSection->second.end())
     {
         itSection->second.insert(make_pair<string,string>(strKey, strDef));
     }
     else
     {
-        ifKeyVal->second = strDef;
+        itKeyVal->second = strDef;
     }
     return strDef;
 }
@@ -122,14 +122,14 @@ int TConfigBase::SetTagValue(string strSection, string strKey, int iDef)
     sprintf(szDef, "%d", iDef);
     string strDef = szDef;
 
-    MAP_SECTIONS::iterator itKeyVal = itSection->second.find(strKey);
+    MAP_KEYVALS::iterator itKeyVal = itSection->second.find(strKey);
     if( itKeyVal == itSection->second.end())
     {
         itSection->second.insert(make_pair<string,string>(strKey, strDef));
     }
     else
     {
-        ifKeyVal->second = strDef;
+        itKeyVal->second = strDef;
     }
     return iDef;
 }
@@ -137,7 +137,7 @@ int TConfigBase::SetTagValue(string strSection, string strKey, int iDef)
 // 加载配置文件(ini格式)
 int TConfigBase::LoadIniFile(string sPathName)
 {
-    File *hFile = NULL;
+    FILE *hFile = NULL;
     char szData[2048+1] = {0};
     char *pTmp = NULL;
     char szOldSection[100+1] = {0};
@@ -161,7 +161,7 @@ int TConfigBase::LoadIniFile(string sPathName)
         {
             break;
         }
-        Trim(szData)
+        Trim(szData);
         // 过滤空行
         if( 0 == szData[0])
         {
@@ -237,7 +237,7 @@ int TConfigBase::LoadXmlFile(string sPathName)
     docParse.Parse(szBuff, NULL, TIXML_DEFAULT_ENCODING);
     if( true == docParse.Error())
     {
-        printf("Parse file failed.[%s]\n", docPrase.ErrorDesc());
+        printf("Parse file failed.[%s]\n", docParse.ErrorDesc());
         return -2;
     }
 
@@ -245,7 +245,7 @@ int TConfigBase::LoadXmlFile(string sPathName)
     TiXmlElement *pRootElement = docParse.RootElement();
     if( NULL == pRootElement)
     {
-        printf("Parse file failed.[%s]\n", docPrase.ErrorDesc());
+        printf("Parse file failed.[%s]\n", docParse.ErrorDesc());
         return -3;
     }
 
@@ -270,7 +270,7 @@ int TConfigBase::LoadXmlFile(string sPathName)
         }
 
         // 解析部件
-        for( TiXmlAttribute* a = pSectionElement->FirstAttribute(); a; a= a->Next())
+        for( TiXmlAttribute* a = pSectionElement->FirstAttribute(); a; a = a->Next())
         {
             sAttributeName = a->Name();
             Trim(sAttributeName);
@@ -397,7 +397,7 @@ int TConfigBase::LoadXmlFile(string sPathName)
             }
             pOptionElement = pOptionElement->NextSiblingElement();
         }
-        m_mapSection.insert(make_pair<string, MAP_KEYVALS>(sSection, mapKeyVals));
+        m_mapSections.insert(make_pair<string, MAP_KEYVALS>(sSection, mapKeyVals));
         pSectionElement = pSectionElement->NextSiblingElement();
     }
 

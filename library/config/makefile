@@ -18,7 +18,9 @@ CXXFLAGS=-m64 -O0 -fPIC
 SHARE=-shared
 
 ##################头文件和依赖库##############################
-INC = -I$(PATH_PRJ)/include
+INC_BASE = ../base/include
+INC_XML  = ../tinyxml/include
+INC = -I$(PATH_PRJ)/include -I$(INC_BASE) -I$(INC_XML)
 LIB =
 
 ##################编译中间.o文件##############################
