@@ -15,9 +15,8 @@
 #include "exception.h"
 #include "datetime.h"
 
-namespace ips
+namespace commbase
 {
-
 // 构造函数
 Exception::Exception()
 {

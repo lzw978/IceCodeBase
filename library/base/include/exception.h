@@ -17,9 +17,8 @@
 #include <string>
 #include "sourceInfo.h"
 
-namespace ips
+namespace commbase
 {
-
 using namespace std;
 
 class Exception
