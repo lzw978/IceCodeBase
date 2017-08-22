@@ -25,8 +25,9 @@ LIB =
 VPATH = ./src:$(PATH_OBJ)
 LIBOBJ = ShareMemory.o\
          datetime.o\
-         apppubfunc.o\
-         sourceInfo.o
+         sourceInfo.o\
+		 exception.o\
+         apppubfunc.o
 
 ##################固定########################################
 .SUFFIXES:
