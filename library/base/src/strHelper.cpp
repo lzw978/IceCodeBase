@@ -230,9 +230,9 @@ namespace commbase
         retStr.resize(iLength, 0);
 
         static char table[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        for (int i=0; i<iLength-1; ++i)
+        for (int i=0; i<iLength; ++i)
         {
-            retStr += table[ (int)ToolKit::random(0, sizeof(table)-1) ];
+            retStr[i] = table[ (int)ToolKit::random(0, sizeof(table)-1) ];
         }
         return retStr;
     }
@@ -356,7 +356,7 @@ namespace commbase
         if (inStr.size() <= 0)
             return inStr;
 
-        string::size_type pos = inStr.find_first_not_of(char2trim);
+        string::size_type pos = inStr.find_last_not_of(char2trim);
         if (pos != string::npos)
             inStr.erase(pos+1);
         return inStr;
@@ -455,6 +455,7 @@ namespace commbase
         }
         return bigString;
     }
+
     // 读取字符串中key对应value： 字符串格式示例= abc:val1:def:val2
     string StrHelper::readKeyFromExtString(string &bigString, string strKey)
     {
@@ -485,6 +486,17 @@ namespace commbase
 
         retStr = bigString.substr(posStart, posEnd-posStart);
         return retStr;
+    }
+
+    // 重复字符串
+    string StrHelper::repeat(const string &inStr, size_t count)
+    {
+        string strOut;
+        for (size_t i=0; i<count; ++i)
+            strOut += inStr;
+        if (count <= 0)
+            return "";
+        return strOut;
     }
 
     // 字符串格式化类实现

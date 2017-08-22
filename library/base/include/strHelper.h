@@ -26,10 +26,10 @@ namespace commbase
 
     //! 字符串公共函数
     // 浮点型转字符串
-    string double2string(double dVal, string format="0.2lf");
+    string double2string(double dVal, string format="%0.2lf");
     // 整形转字符串
     string int2string(int iVal, string format="%d");
-    // 计算utf8编码字符串长度
+    // 计算utf8编码字符串长度(一个汉字按照单位长度1进行计算)
     int strlenUtf8(const char *szStr);
 
 
@@ -62,19 +62,19 @@ namespace commbase
         static string trimLeft(string inStr, const char* char2trim = "\r\n \t");
         // 去右空格
         static string trimRight(string inStr, const char*char2trim = "\r\n \t");
-        // 字符串分割
+        // 字符串分割(待分割字符串结尾不能带分割符,否则最后一个元素为空)
         static vector<string> &split(const string &str, char delim, vector<string> &elems);
         // 字符串分割
         static vector<string> split(const string &str, char delim);
-        // 字符串分割
+        // 字符串分割(keep_empty用于控制是否保存分割符中为空的字串,true表示保留)
         static vector<string> split(const string &str, const string &delim, const bool keep_empty = true);
         // 字符串填充
         static string strpad(string inStr, char charToFill, size_t lastStrLength, strPadDirect_t dir=eStrPadDirectRight);
-        // 设置字符串中key
+        // 设置字符串中key对应的value值
         static string setKeyToExtString(string &bigString, string strKey, string strVal);
-        // 读取字符串中key对应value
+        // 读取字符串中key对应value(字符串格式示例= abc:val1:def:val2)
         static string readKeyFromExtString(string &bigString, string strKey);
-        // 重复
+        // 返回重复输入次数的字符串
         static string repeat(const string &inStr, size_t count);
     };
 
