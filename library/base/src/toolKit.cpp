@@ -11,6 +11,10 @@
  **  问    题：
 *********************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 #include "toolKit.h"
 
 namespace commbase

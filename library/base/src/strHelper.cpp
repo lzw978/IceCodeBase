@@ -10,7 +10,12 @@
  **  特别说明:
  **  问    题：
 *********************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdarg.h>
+#include <sstream>
 #include <algorithm>
 #include "strHelper.h"
 
