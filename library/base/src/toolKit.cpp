@@ -70,7 +70,7 @@ namespace commbase
         if (inHexStr.length()%2 != 0)
             return false;
 
-        char szBuffer[3] = {0};
+        char szBuffer[3] = {0,0,0};
         unsigned char charVal;
         unsigned char *pBuffer = (unsigned char*)outBuffer;
 
@@ -92,9 +92,9 @@ namespace commbase
             if (szBuffer[1] >= '0' && szBuffer[1] <= '9')
                 charVal += szBuffer[1] - '0';
             else if (szBuffer[1] >= 'A' && szBuffer[1] <= 'F')
-                charVal = szBuffer[1] - 'A' + 10;
+                charVal += szBuffer[1] - 'A' + 10;
             else
-                charVal = szBuffer[1] - 'a' + 10;
+                charVal += szBuffer[1] - 'a' + 10;
 
             pBuffer[i] = charVal;
         }
