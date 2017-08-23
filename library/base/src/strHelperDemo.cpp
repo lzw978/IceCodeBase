@@ -114,6 +114,25 @@ int main()
     strOut = StrHelper::repeat(newVal, 5);
     cout << "StrHelper::repeat= [" << strOut << "]" << endl;
 
+    // 测试字符串格式化类
+    formatStr myForStr("str=[%s] int=[%d] double=[%.2lf]", "format test", 100, 13.14);
+    cout << myForStr.c_str() << endl;
+
+    // KVString测试
+    string KeyValString = "abc=kvString;bcd=101;def=13.14";
+    string val1;
+    KVString myKVString(KeyValString);
+    cout << "KeyValString: string=" << myKVString.getString("abc") << endl;
+    cout << "KeyValString: double=" << myKVString.getDouble("def") << endl;
+    cout << "KeyValString: int=" << myKVString.getInt("ABC", 10) << endl;
+    myKVString.setString("abc", "testOk");
+    myKVString.setDouble("def", 33.44);
+    myKVString.setInt("bcd", 103);
+    cout << "KeyValString: toString=" << myKVString.toString() << endl;
+    cout << "KeyValString: string=" << myKVString.getString("abc") << endl;
+    cout << "KeyValString: double=" << myKVString.getDouble("def") << endl;
+    cout << "KeyValString: int=" << myKVString.getInt("bcd", 10) << endl;
+
     getchar();
     return 0;
 }
