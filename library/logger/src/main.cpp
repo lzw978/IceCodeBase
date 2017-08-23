@@ -10,9 +10,9 @@
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  YOUR NAME (lzw978), 
- *   Organization:  
- *    g++ -g -o MAIN -I../include main.cpp logger.cpp 
+ *         Author:  YOUR NAME (lzw978),
+ *   Organization:
+ *    g++ -g -o MAIN -I../include main.cpp logger.cpp
  * =====================================================================================
  */
 #include <stdlib.h>

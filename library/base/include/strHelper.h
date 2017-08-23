@@ -29,6 +29,7 @@ namespace commbase
     string double2string(double dVal, string format="%0.2lf");
     // 整形转字符串
     string int2string(int iVal, string format="%d");
+
     // 计算utf8编码字符串长度(一个汉字按照单位长度1进行计算)
     int strlenUtf8(const char *szStr);
 
@@ -37,7 +38,7 @@ namespace commbase
     class StrHelper
     {
     public:
-        // GBK编码字符串截取函数(一个中文按照单位长度2进行计算)
+        // GBK编码字符串截取函数(一个汉字按照单位长度2进行计算)
         static string getGbkSubString(string bigGbkStr, size_t from, size_t length);
         // 获取合法的GBK字符串(替换掉非法字符)
         static string getValidGbkString(string strOriGbkStr, bool bDelBadChar=false, char replaceBadChar=' ');
@@ -76,6 +77,9 @@ namespace commbase
         static string readKeyFromExtString(string &bigString, string strKey);
         // 返回重复输入次数的字符串
         static string repeat(const string &inStr, size_t count);
+        // 获取字符串hashcode
+        static int hashCode(const char* pData, int iLen);
+        static int hashCode(const std::string& s);
     };
 
     // 字符串格式化

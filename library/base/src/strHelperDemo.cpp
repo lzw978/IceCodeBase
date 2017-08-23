@@ -118,6 +118,9 @@ int main()
     // 重复字符串
     strOut = StrHelper::repeat(newVal, 5);
     cout << "StrHelper::repeat= [" << strOut << "]" << endl;
+    // 获取hashcode
+    int iHashCode = StrHelper::hashCode(toRepStr);
+    cout << "StrHelper::hashCode= [" << iHashCode << "]" << endl;
 
     // 测试字符串格式化类
     formatStr myForStr("str=[%s] int=[%d] double=[%.2lf]", "format test", 100, 13.14);

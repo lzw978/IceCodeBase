@@ -35,6 +35,7 @@ namespace commbase
         snprintf(szVal, sizeof(szVal), format.c_str(), iVal);
         return szVal;
     }
+
     // 计算utf8编码字符串长度
     int strlenUtf8(const char *szStr)
     {
@@ -498,6 +499,27 @@ namespace commbase
             return "";
         return strOut;
     }
+    // 获取字符串的hashCode
+    int StrHelper::hashCode(const char* pData, int iLen)
+    {
+        int h = 0;
+        if (pData != NULL && iLen > 0)
+        {
+            unsigned char c;
+            for (int i = 0; i < iLen; i++)
+            {
+                c = (unsigned char)pData[i];
+                h = 31 * h + c;
+            }
+        }
+        return h;
+    }
+    int StrHelper::hashCode(const std::string& s)
+    {
+        return hashCode(s.c_str(), s.length());
+    }
+
+
 
     // 字符串格式化类实现
     formatStr::formatStr(const char* fmt...)
