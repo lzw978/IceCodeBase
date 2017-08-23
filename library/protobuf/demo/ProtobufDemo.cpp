@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
 {
     string strHead;
     string strBody;
+    int iSize = 0;
     protocol::Entry* msg_test = new protocol::Entry();
     msg_test->set_entrytype(protocol::ROWDATA);
 
@@ -107,14 +108,24 @@ int main(int argc, char *argv[])
 
     // 序列化转换头
     msg_test->set_storevalue(strBody);
-    msg_test->SerializeToString(&strHead);
-    cout << "head = [" <<  strHead << "] " << "  length=" << strHead.length() << endl;
 
-    
-    
+    iSize = msg_test->ByteSize();
+    char *pBuffer = NULL;
+    pBuffer = (char*)malloc(iSize);
+    if( NULL == pBuffer)
+    {
+        cout << "malloc error!" << endl;
+        return -1;
+    }
+    msg_test->SerializeToArray(pBuffer, iSize);
+
+    // 赋值给常量
+    const char* pMsg = pBuffer;
+
+
     // 解析测试
     Entry parseMsg;
-    parseMsg.ParseFromString(strHead);
+    parseMsg.ParseFromArray(pMsg, iSize);
     cout << "head tablename = [" << parseMsg.header().tablename() << "]" << endl;
     if(parseMsg.has_header())
     {
@@ -132,6 +143,9 @@ int main(int argc, char *argv[])
             }
         }
     }
+
+    delete pBuffer;
+    pBuffer = NULL;
 
     return 0;
 }
