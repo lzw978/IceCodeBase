@@ -37,9 +37,9 @@ namespace commbase
     class StrHelper
     {
     public:
-        // GBK编码字符串截取函数
-        static string getGbkSubSting(string bigGbkStr, size_t from, size_t length);
-        // GBK编码字符串截取函数(替换非法字符)
+        // GBK编码字符串截取函数(一个中文按照单位长度2进行计算)
+        static string getGbkSubString(string bigGbkStr, size_t from, size_t length);
+        // 获取合法的GBK字符串(替换掉非法字符)
         static string getValidGbkString(string strOriGbkStr, bool bDelBadChar=false, char replaceBadChar=' ');
         // 获取随机字符串
         static string randomString(int iLength);

@@ -50,7 +50,7 @@ namespace commbase
     }
 
     // GBK字符串截取
-    string StrHelper::getGbkSubSting(string bigGbkStr, size_t from, size_t length)
+    string StrHelper::getGbkSubString(string bigGbkStr, size_t from, size_t length)
     {
         string subString;
         if ( bigGbkStr.length()<= 0 || length<=0 )
@@ -62,7 +62,7 @@ namespace commbase
 
         char *pBuffer = new char[bigGbkStr.length()+2];
         Z_ASSERT(pBuffer != NULL);
-        memset(pBuffer, 0, sizeof(bigGbkStr.length()+2));
+        memset(pBuffer, 0, bigGbkStr.length()+2);
         memcpy(pBuffer, bigGbkStr.c_str(), bigGbkStr.length());
 
         // 过滤非法GBK字符
@@ -130,7 +130,7 @@ namespace commbase
             if ( (*pStringEnd)>=0x81 && (*pStringEnd)<=0xFE )
             {
                 // 只取一个字符, 并且这个字符是非法的.
-                if ((pStringEnd+1)==pTmpEndPos) 
+                if ((pStringEnd+1)==pTmpEndPos)
                 {
                     *pStringEnd = ' ';
                     continue;
@@ -154,7 +154,7 @@ namespace commbase
         return subString;
     }
 
-    // [0x81-0xFE][0x40-0xFE] 获取GBK字符串字串,替换非法字符
+    // [0x81-0xFE][0x40-0xFE] 获取合法的GBK字符串(替换掉非法字符)
     string StrHelper::getValidGbkString(string strOriGbkStr, bool bDelBadChar, char replaceBadChar)
     {
         /*
@@ -172,7 +172,7 @@ namespace commbase
             return strOriGbkStr;
 
         char *pBuffer = strdup(strOriGbkStr.c_str());
-        //Z_ASSERT(pBuffer!=NULL);
+        Z_ASSERT(pBuffer!=NULL);
 
         // 过滤非法GBK字符
         unsigned char *pStrip = (unsigned char *)pBuffer;

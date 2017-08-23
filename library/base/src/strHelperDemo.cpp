@@ -32,7 +32,10 @@ int main()
     int iLen = 0;
     double dTestNum = 123.14;
     int iTestNum = 150;
-    const char* pTestStr = "utf8字符串";
+    // UTF8字符串（测试UTF8函数前需要先将文件编码修改为UTF8)
+    string UTF8string = "utf8字符串";
+    // GBK字符串（测试GBK函数前需要先将本文将编码修改为GBK)
+    string GBKstring = "中文GBK测试字符串";
 
     // 待替换字符串
     string toRepStr = "MYTEST 123 test 978 is ok 测试文本ok";
@@ -43,16 +46,18 @@ int main()
     // 带空格字符串
     string spaceStr = "     MYTEST 测试文本 ok     ";
 
-
+    // 截取gbk字符串
+    //strOut = StrHelper::getGbkSubString(GBKstring, 0, 7);
+    //cout << "StrHelper::getGbkSubString = [" << strOut << "]" << endl;
     // double转字符串
     strOut = double2string(dTestNum);
-    cout << "double2string=" << strOut << endl;
+    cout << "double2string = " << strOut << endl;
     // int转字符串
     strOut = int2string(iTestNum);
-    cout << "int2string=" << strOut << endl;
+    cout << "int2string = " << strOut << endl;
     // 计算utf8字符串长度，输出为7，每个汉字计算为长度1
-    iLen = strlenUtf8(pTestStr);
-    cout << "strlenUtf8=" << iLen << endl;
+    iLen = strlenUtf8(UTF8string.c_str());
+    cout << "strlenUtf8 = " << iLen << endl;
     // 获取随机字符串(产生一个长度10的随机字符串)
     strOut = StrHelper::randomString(10);
     cout << "StrHelper::randomString = [" << strOut << "]" << endl;
@@ -133,6 +138,5 @@ int main()
     cout << "KeyValString: double=" << myKVString.getDouble("def") << endl;
     cout << "KeyValString: int=" << myKVString.getInt("bcd", 10) << endl;
 
-    getchar();
     return 0;
 }
