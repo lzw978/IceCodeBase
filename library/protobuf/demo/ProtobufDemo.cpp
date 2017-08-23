@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 
     iSize = msg_test->ByteSize();
     char *pBuffer = NULL;
-    pBuffer = (char*)malloc(iSize);
+    pBuffer = new char[iSize];
     if( NULL == pBuffer)
     {
         cout << "malloc error!" << endl;
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    delete pBuffer;
+    delete[] pBuffer;
     pBuffer = NULL;
 
     return 0;
