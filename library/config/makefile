@@ -1,7 +1,7 @@
 ###################目标文件###################################
-TARGET = libConfigXml
+TARGET = libConfigBase
 VERSION = 0.0.1
-LIB_NAME = libConfigXml.so
+LIB_NAME = libConfigBase.so
 
 ###################目录配置###################################
 PATH_HOME= ../config
@@ -42,6 +42,6 @@ all: $(TARGET)
 clean:
 	rm -f *.o *.a *.out core
 
-libConfigXml: $(LIBOBJ)
+libConfigBase: $(LIBOBJ)
 	-rm  -rf $(LIB_NAME)
 	$(CPP) $(DEBUG) $(CXXFLAGS) $(SHARE) -o $(LIB_NAME) $(LIBOBJ) $(LIB)

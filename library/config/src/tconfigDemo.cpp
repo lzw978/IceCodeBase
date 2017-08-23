@@ -13,7 +13,7 @@
  *         Author:  lzw978
  *   Organization:
  *   编译src目录下执行：
- *   g++ -g -o CONFIGDEMO -I../include -L../ -L../../tinyxml -L../../base -lConfigXml -lTinyXml -lCommBase -lrt tconfigDemo.cpp
+ *   g++ -g -o CONFIGDEMO -I../include -L../ -L../../tinyxml -L../../base -lConfigBase -lTinyXml -lCommBase -lrt tconfigDemo.cpp
  * =====================================================================================
  */
 #include <string>
