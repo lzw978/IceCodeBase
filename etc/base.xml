@@ -14,4 +14,17 @@
         <Option name="DBSLEEP"            desc="数据库断线重连间隔(秒)">10</Option>
         <Option name="DBRECONN"           desc="数据库断线重连次数">3</Option>
     </Section>
+
+    <Section name="PROCINFO" desc="服务信息">
+        <PID name="RECV" desc="来帐主控">
+            <Option name="PROCNAME"       desc="进程名">recvmain</Option>
+            <Option name="PROCARGV"       desc="进程入参">123</Option>
+            <Option name="PROCNUM"        desc="进程数">1</Option>
+        </PID>
+        <PID name="SEND" desc="往账主控">
+            <Option name="PROCNAME"       desc="进程名">sendmain</Option>
+            <Option name="PROCARGV"       desc="进程入参">abc</Option>
+            <Option name="PROCNUM"        desc="进程数">2</Option>
+        </PID>
+    </Section>
 </ConfigFile>

@@ -56,7 +56,9 @@ int main(int argc, char *argv[])
     cout << "xml LOGLEVEL = [" << iValue << "]" << endl;
     strValue = configXmlFile.GetTagValue("DBINFO", "DBURL", "");
     cout << "xml DBURL = [" << strValue << "]" << endl;
-
+    // 读取PID节点下配置
+    strValue = configXmlFile.GetTagValue("SEND", "PROCNAME", "");
+    cout << "xml PROCNAME = [" << strValue << "]" << endl;
 
     return 0;
 }
