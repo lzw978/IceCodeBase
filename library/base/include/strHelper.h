@@ -97,7 +97,7 @@ namespace commbase
         char* m_pBuffer;
     };
 
-    // KeyValue格式字符串
+    // KeyValue格式字符串,示例：;abc=testOk;bcd=103;def=33.44;
     class KVString
     {
     public:
@@ -107,7 +107,7 @@ namespace commbase
 
         // 转换为字符串
         string toString();
-        // 根据key获取值
+        // 根据key获取值(如果获取不到，取第二个参数设置的默认值)
         string getString(const string &strKey, string strDefVal="");
         int    getInt(const string &strKey, int iDefVal=0);
         double getDouble(const string &strKey, double dDefVal=0);
