@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="gbk"?>
+<ConfigFile reloadCycle="60">
+    <Section name="LOGINFO" desc="日志信息">
+        <Option name="LOGLEVEL"           desc="0:系统级日志 1:重要日志 2:错误日志 3:提示信息 4:调试信息">4</Option>
+        <Option name="LOGPATH"            desc="日志文件存放目录">/home/user/log</Option>
+        <Option name="LOGMAXSIZE"         desc="每个日志文件最大容量(字节)">10000000</Option>
+        <Option name="ERRLOGNAME"         desc="错误日志文件存放全名称(空表示不使用)">/home/user/bin/SCPSERR.log</Option>
+    </Section>
+    <Section name="DBINFO" desc="数据库信息">
+        <Option name="DBTYPE"             desc="数据库类型:oracle/db2/mysql">oracle</Option>
+        <Option name="DBURL"              desc="连接字符串">;dbDriver=oracle;dName=sztc;</Option>
+        <Option name="DBUSER"             desc="数据库用户">test</Option>
+        <Option name="DBPASSWD"           desc="数据库密码">test</Option>
+        <Option name="DBSLEEP"            desc="数据库断线重连间隔(秒)">10</Option>
+        <Option name="DBRECONN"           desc="数据库断线重连次数">3</Option>
+    </Section>
+</ConfigFile>

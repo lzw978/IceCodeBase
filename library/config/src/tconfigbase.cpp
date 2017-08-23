@@ -224,6 +224,7 @@ int TConfigBase::LoadXmlFile(string sPathName)
     TiXmlDocument docParse;
 
     // 加载文件
+    fConfig = fopen(sPathName.c_str(), "rb");
     if(NULL == fConfig)
     {
         printf("Open file [%s] error\n", sPathName.c_str());
