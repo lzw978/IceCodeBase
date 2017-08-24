@@ -123,7 +123,8 @@ int CCommSMM::InitSMM(const char* lpMsgFile, const char* lpPath, int iMaxMsgLen,
     char szTmp[256+1] = {0};
     char *pTmp = NULL;
     // 获取配置文件路径
-    char *pEtc = getenv("SCPS_ETC");
+    //char *pEtc = getenv("SCPS_ETC");
+    char *pEtc = "/home/linzhenwei/IceCode/library/comm_smm"; //DEBUG
     if (NULL == pEtc)
     {
         snprintf(m_szErrDesc, sizeof(m_szErrDesc), "getenv %s error", "SCPS_ETC");
@@ -162,6 +163,7 @@ int CCommSMM::InitSMM(const char* lpMsgFile, const char* lpPath, int iMaxMsgLen,
             break;
         }
     }
+    printf("szEtc path=[%s]\n", szEtc); //DEBUG
     // 组装消息队列以及共享内存文件名
     strncpy(m_szMsgFile, szEtc, sizeof(m_szMsgFile)-1);
     strcat(m_szMsgFile, ".");
@@ -186,14 +188,17 @@ int CCommSMM::InitSMM(const char* lpMsgFile, const char* lpPath, int iMaxMsgLen,
         m_iMaxMsgNum = MIN_MSG_NUM;
     }
     // 申请缓冲区
-    m_iBuffLen = iMaxMsgLen + 1;
-    m_pBuffer  = new char[iMaxMsgLen+1];
+    m_iBuffLen = m_iMaxMsgLen + 1;
+    m_pBuffer  = new char[m_iMaxMsgLen+1];
+
     if (NULL == m_pBuffer)
     {
-        snprintf(m_szErrDesc, sizeof(m_szErrDesc), "malloc [%d] error[%d][%s]", iMaxMsgLen+1, errno, strerror(errno));
+        snprintf(m_szErrDesc, sizeof(m_szErrDesc), "malloc [%d] error[%d][%s]", m_iMaxMsgLen+1, errno, strerror(errno));
         return -3;
     }
 
+    printf("DEBUG: lpMsgFile=[%s] lpPath=[%s]\n", lpMsgFile, lpPath);
+    printf("DEBUG m_iMaxMsgLen=[%d] m_iMsgMsgNum=[%d] bufferLen=[%d]\n", m_iMaxMsgLen, m_iMaxMsgNum, m_iBuffLen);
     return OpenSMM();
 }
 // 获取消息 iWaitFlag：0-阻塞 1-不阻塞 iWaitTime：等待时间(秒) lpMsgId:同步等待关联ID
@@ -283,6 +288,7 @@ int CCommSMM::GetMsg(string& strMsg, int iWaitFlag, int iWaitTime, const char* l
     // 文件存储
     if ('F' == m_pBuffer[0])
     {
+
         int  iFileLen = 0;
         char szFile[256+1]  = {0};
         char szFileLen[8+1] = {0};
@@ -291,6 +297,8 @@ int CCommSMM::GetMsg(string& strMsg, int iWaitFlag, int iWaitTime, const char* l
         memcpy(szFileLen, m_pBuffer+1, 8);
         memcpy(szFile   , m_pBuffer+9, 256);
         iFileLen = atoi(szFileLen);
+
+        printf("DEBUG: read Largemsg=[%s]\n", szFile);
 
         // 打开文件
         FILE *fp = fopen(szFile, "rb");
@@ -328,12 +336,15 @@ int CCommSMM::PutMsg(const char* lpMsg, int iLen, const char* lpMsgId)
     char szFileLen[8+1] = {0};
     if (iLen > (m_iMaxMsgLen-8))
     {
+        // 构建报文文件名:示例:
         char szTmp[32] = {0};
         snprintf(szTmp, sizeof(szTmp), "%10d%s", getpid(), GetSMMCurrTime());
         strcat(szFile, m_szPath);
         strcat(szFile, "/SMM");
         strcat(szFile, szTmp);
         sprintf(szFileLen, "%08d", iLen);
+
+        printf("DEBUG: write LargeMsg=[%s]\n", szFile);
 
         // 打开文件
         FILE *fp = fopen(szFile, "wb");
@@ -362,7 +373,7 @@ int CCommSMM::PutMsg(const char* lpMsg, int iLen, const char* lpMsgId)
         return -1;
     }
 
-    // 存储数据
+    // 存储数据(获取共享内存中报文数量)
     pSendData = (char*)shmat(m_iShmId, NULL, 0);
     int i = 0;
     for (i=0; i<m_iMaxMsgNum; ++i)
