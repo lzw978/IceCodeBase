@@ -10,7 +10,14 @@
  **  特别说明:
  **  问    题：
 *********************************************/
-
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/sem.h>
+#include <sys/msg.h>
 #include "tsmm.h"
 
 typedef struct {
@@ -101,7 +108,7 @@ int CCommSMM::OpenSMM()
     if (-1 == msgid)
     {
         m_iErrCode = errno;
-        snprintf(m_szErrDesc, sizeof(m_szErrDesc), "create msgqueue msgid [%s] error:[%d][%s]", m_szMsgFile, errno, strerror(errno));
+        snprintf(m_szErrDesc, sizeof(m_szErrDesc), "create msgq msgid [%s] error:[%d][%s]", m_szMsgFile, errno, strerror(errno));
         return msgid;
     }
     m_iMsgId = msgid;
@@ -190,16 +197,244 @@ int CCommSMM::InitSMM(const char* lpMsgFile, const char* lpPath, int iMaxMsgLen,
     return OpenSMM();
 }
 // 获取消息 iWaitFlag：0-阻塞 1-不阻塞 iWaitTime：等待时间(秒) lpMsgId:同步等待关联ID
-int CCommSMM::GetMsg(string& strMsg, iWaitFlag, int iWaitTime, const char* lpMsgId)
+int CCommSMM::GetMsg(string& strMsg, int iWaitFlag, int iWaitTime, const char* lpMsgId)
 {
+    int iRet        = -1;
+    int iRecvLen    = -1;
+    int iMsgFlag    = 0;
+    long lMsgType   = 9;
+    char* pRecvData = NULL;
+    TSMM_MSG stuMsg;
+    memset(&stuMsg, 0, sizeof(stuMsg));
 
+    // 消息类型（大于0，则返回其类型为mtype的第一个消息）
+    if (NULL != lpMsgId && strlen(lpMsgId) > 0)
+    {
+        lMsgType = atol(lpMsgId);
+    }
+    // 不阻塞
+    if ( 1 == iWaitFlag)
+    {
+        iMsgFlag = IPC_NOWAIT;
+    }
+    // 接收数据
+    for (int i=0; i<iWaitTime+1; ++i)
+    {
+        iRecvLen = msgrcv(m_iMsgId, &stuMsg, 8, lMsgType, iMsgFlag);
+        if (iRecvLen < 0)
+        {
+            // 没有消息
+            if ( IPC_NOWAIT == iMsgFlag && ENOMSG == errno)
+            {
+                // 如果不等待，没有消息则立即返回,否则休眠继续等待
+                if ( 0 == iWaitTime)
+                {
+                    return 0;
+                }
+                sleep(1);
+                continue;
+            }
+            // 其他错误返回错误码跟描述
+            m_iErrCode = errno;
+            snprintf(m_szErrDesc, sizeof(m_szErrDesc), "recv msg error[%d][%s]", errno, strerror(errno));
+            return iRecvLen;
+        }
+        else
+        {
+            // 读取消息成功
+            break;
+        }
+    }
+
+    // 判断读取的数据
+    if (iRecvLen < 0)
+    {
+        if ( IPC_NOWAIT == iMsgFlag && ENOMSG == errno)
+        {
+            snprintf(m_szErrDesc, sizeof(m_szErrDesc), "recv msg no data.");
+            return 0;
+        }
+        m_iErrCode = errno;
+        snprintf(m_szErrDesc, sizeof(m_szErrDesc), "recv msg error[%d][%s]", errno, strerror(errno));
+        return iRecvLen;
+    }
+
+    // 记录偏移量
+    int iPos = atoi(stuMsg.mtext);
+    // 读取数据
+    pRecvData = (char*)shmat(m_iShmId, NULL, 0);
+    if (NULL == pRecvData || 0 == pRecvData[iPos*m_iMaxMsgLen+1])
+    {
+        iRecvLen = 1;
+        strMsg = "";
+    }
+    else
+    {
+        memset(m_pBuffer, 0, m_iBuffLen);
+        memcpy(m_pBuffer, pRecvData+iPos*m_iMaxMsgLen+1, m_iMaxMsgLen-1);
+        strMsg = m_pBuffer + 1;
+        iRecvLen = strMsg.length();
+    }
+    // 还原回“未使用”状态（此行代码别的进程就变为N）
+    memcpy(pRecvData+iPos*m_iMaxMsgLen, "N", 1);
+    // 此行代码不会影响别的进程的数据
+    shmdt(pRecvData);
+
+    // 文件存储
+    if ('F' == m_pBuffer[0])
+    {
+        int  iFileLen = 0;
+        char szFile[256+1]  = {0};
+        char szFileLen[8+1] = {0};
+        char *pFileBuff = NULL;
+
+        memcpy(szFileLen, m_pBuffer+1, 8);
+        memcpy(szFile   , m_pBuffer+9, 256);
+        iFileLen = atoi(szFileLen);
+
+        // 打开文件
+        FILE *fp = fopen(szFile, "rb");
+        if ( NULL == fp)
+        {
+            snprintf(m_szErrDesc, sizeof(m_szErrDesc), "fopen [%s] error [%d][%s]", szFile, errno, strerror(errno));
+            return -2;
+        }
+        // 申请缓冲区
+        pFileBuff = new char[iFileLen+1];
+        // 读取文件
+        fread(pFileBuff, 1, iFileLen, fp);
+        fclose(fp);
+        // 防止结尾乱码
+        pFileBuff[iFileLen] = 0;
+        strMsg = pFileBuff;
+        iRecvLen = strMsg.length();
+        // 释放资源
+        delete pFileBuff;
+        remove(szFile);
+    }
+    return iRecvLen;
 }
 // 发送消息
 int CCommSMM::PutMsg(const char* lpMsg, int iLen, const char* lpMsgId)
 {
+    int iRet = -1;
+    int iSendLen = -1;
+    char *pSendData = NULL;
+    TSMM_MSG stuMsg;
+    memset(&stuMsg, 0, sizeof(stuMsg));
 
+    // 报文超过内存大小，转为文件存储(在锁外面完成，减少锁时间)
+    char szFile[256+1] = {0};
+    char szFileLen[8+1] = {0};
+    if (iLen > (m_iMaxMsgLen-8))
+    {
+        char szTmp[32] = {0};
+        snprintf(szTmp, sizeof(szTmp), "%10d%s", getpid(), GetSMMCurrTime());
+        strcat(szFile, m_szPath);
+        strcat(szFile, "/SMM");
+        strcat(szFile, szTmp);
+        sprintf(szFileLen, "%08d", iLen);
+
+        // 打开文件
+        FILE *fp = fopen(szFile, "wb");
+        if ( NULL == fp)
+        {
+            snprintf(m_szErrDesc, sizeof(m_szErrDesc), "fopen [%s] error [%d][%s]", szFile, errno, strerror(errno));
+            return -2;
+        }
+        // 写入文件
+        fwrite(lpMsg, 1, iLen, fp);
+        fclose(fp);
+    }
+
+    // 加锁
+    struct flock fLck;
+    fLck.l_type   = F_WRLCK;
+    fLck.l_whence = SEEK_SET;
+    fLck.l_start  = 0;
+    fLck.l_len    = 0;
+
+    iRet = fcntl(m_iFdLck, F_SETLKW, &fLck);
+    if (iRet < 0)
+    {
+        m_iErrCode = errno;
+        snprintf(m_szErrDesc, sizeof(m_szErrDesc), "lock [%s][%d] error [%d][%s]", m_szMsgFile, m_iFdLck, errno, strerror(errno));
+        return -1;
+    }
+
+    // 存储数据
+    pSendData = (char*)shmat(m_iShmId, NULL, 0);
+    int i = 0;
+    for (i=0; i<m_iMaxMsgNum; ++i)
+    {
+        if ( 'U' == pSendData[i*m_iMaxMsgLen])
+        {
+            continue;
+        }
+        else // "未使用"状态
+        {
+            // 报文超过内存大小，转为文件存储
+            if (iLen > (m_iMaxMsgLen-8))
+            {
+                memset(pSendData+i*m_iMaxMsgLen  , 0, m_iMaxMsgLen);
+                memcpy(pSendData+i*m_iMaxMsgLen  , "U", 1);
+                memcpy(pSendData+i*m_iMaxMsgLen+1, "F", 1);
+                memcpy(pSendData+i*m_iMaxMsgLen+2, szFileLen, 8);
+                memcpy(pSendData+i*m_iMaxMsgLen+10, szFile, strlen(szFile));
+            }
+            else
+            {
+                memset(pSendData+i*m_iMaxMsgLen  , 0, m_iMaxMsgLen);
+                memcpy(pSendData+i*m_iMaxMsgLen  , "U", 1);
+                memcpy(pSendData+i*m_iMaxMsgLen+1, "N", 1);
+                memcpy(pSendData+i*m_iMaxMsgLen+2, lpMsg, iLen);
+            }
+            break;
+        }
+    }
+    shmdt(pSendData);
+
+    // 解锁
+    struct flock fUnLck;
+    fUnLck.l_type   = F_UNLCK;
+    fUnLck.l_whence = SEEK_SET;
+    fUnLck.l_start  = 0;
+    fUnLck.l_len    = 0;
+    iRet = fcntl(m_iFdLck, F_SETLK, &fUnLck);
+    if (iRet < 0)
+    {
+        m_iErrCode = errno;
+        snprintf(m_szErrDesc, sizeof(m_szErrDesc), "unlock [%s][%d] error [%d][%s]", m_szMsgFile, m_iFdLck, errno, strerror(errno));
+        return -1;
+    }
+
+    // 判断是否超过报文个数
+    if ( i >= m_iMaxMsgNum)
+    {
+        m_iErrCode = -1;
+        snprintf(m_szErrDesc, sizeof(m_szErrDesc), "shm catch full.[%d]", m_iMaxMsgNum);
+        return -1;
+    }
+
+    // 消息类型
+    stuMsg.mtype = 9;
+    if (NULL!=lpMsgId && strlen(lpMsgId)>0)
+    {
+        stuMsg.mtype = atol(lpMsgId);
+    }
+    sprintf(stuMsg.mtext, "%08d", i);
+
+    // 发送数据
+    iSendLen = msgsnd(m_iMsgId, &stuMsg, 8, IPC_NOWAIT);
+    if (iSendLen < 0)
+    {
+        m_iErrCode = errno;
+        snprintf(m_szErrDesc, sizeof(m_szErrDesc), "send msg error...[%d][%s]", errno, strerror(errno));
+        return iSendLen;
+    }
+    return iSendLen;
 }
-// 获取当前时间
+// 获取当前时间(20字节长度)
 char* CCommSMM::GetSMMCurrTime()
 {
     static char szCurrTime[32] = {0};

@@ -9,16 +9,19 @@
  **  修改目的：
  **  特别说明:共享内存(第1字节表示是否使用，第2字节表示内部是否为文件存储)
              消息队列(一个消息8字节表示内存偏移)(单机使用)
+             文件报文  ：UF+8位报文长度+报文内容
+             非文件报文：UN+报文内容
  **  问    题：
 *********************************************/
 
 #ifndef __LIB_TSMM_H__
 #define __LIB_TSMM_H__
 
-#include <string>
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <string>
 
 using namespace std;
 
@@ -36,7 +39,7 @@ public:
     // 初始化
     int InitSMM(const char* lpMsgFile, const char* lpPath, int iMaxMsgLen, int iMaxMsgNum);
     // 获取消息 iWaitFlag：0-阻塞 1-不阻塞 iWaitTime：等待时间(秒) lpMsgId:同步等待关联ID
-    int GetMsg(string& strMsg, iWaitFlag=1, int iWaitTime=0, const char* lpMsgId=NULL);
+    int GetMsg(string& strMsg, int iWaitFlag=1, int iWaitTime=0, const char* lpMsgId=NULL);
     // 发送消息
     int PutMsg(const char* lpMsg, int iLen, const char* lpMsgId=NULL);
     // 获取当前时间
@@ -57,6 +60,6 @@ private:
     char m_szMsgId[24+1];       // 同步等待关联ID
     char m_szErrDesc[1024+1];   // 错误描述
     char* m_pBuffer;            // 缓冲区指针
-}；
+};
 
 #endif
