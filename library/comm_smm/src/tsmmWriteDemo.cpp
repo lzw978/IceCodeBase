@@ -24,15 +24,12 @@ int main(int argc, char* argv[])
     CCommSMM oCommSmm;
 
     string strSmmMsgFile = "LZWTEST";
-    string strSmmPath    = "./";
+    string strSmmPath    = "."; // 设置为当前目录
     int iSmmMsgLen = 1024;
     int iSmmMsgNum = 1;
 
-    string strMsg = "LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11"
-    "LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11"
-    "LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11"
-    "LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11"
-    "LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11";
+    string strMsg = "LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11LargeMsgToTestQueueIsOk11";
+
 
     // 初始化写共享内存
     int iRet = oCommSmm.InitSMM(strSmmMsgFile.c_str(), strSmmPath.c_str(), iSmmMsgLen, iSmmMsgNum);

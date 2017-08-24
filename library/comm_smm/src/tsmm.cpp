@@ -338,13 +338,13 @@ int CCommSMM::PutMsg(const char* lpMsg, int iLen, const char* lpMsgId)
     {
         // 构建报文文件名:示例:
         char szTmp[32] = {0};
-        snprintf(szTmp, sizeof(szTmp), "%10d%s", getpid(), GetSMMCurrTime());
+        snprintf(szTmp, sizeof(szTmp), "%010d%s", getpid(), GetSMMCurrTime());
         strcat(szFile, m_szPath);
         strcat(szFile, "/SMM");
         strcat(szFile, szTmp);
         sprintf(szFileLen, "%08d", iLen);
 
-        printf("DEBUG: write LargeMsg=[%s]\n", szFile);
+        printf("DEBUG: write LargeMsg=[%s] szFileLen=[%s] iLen=[%d]\n", szFile, szFileLen, iLen);
 
         // 打开文件
         FILE *fp = fopen(szFile, "wb");

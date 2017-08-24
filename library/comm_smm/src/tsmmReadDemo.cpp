@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     CCommSMM oCommSmm;
 
     string strSmmMsgFile = "LZWTEST";
-    string strSmmPath    = "./";
+    string strSmmPath    = "."; // 设置为当前目录
     string strMsg = "";
     int iSmmMsgLen = 1024;
     int iSmmMsgNum = 1;
