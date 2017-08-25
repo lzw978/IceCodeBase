@@ -24,16 +24,16 @@ namespace commbase
     public:
         Base64();
 
-        // 编码
-        void encode(FILE *, std::string& , bool add_crlf = false);
-        void encode(const std::string&, std::string& , bool add_crlf = false);
-        void encode(const char *, size_t, std::string& , bool add_crlf = false);
-        void encode(const unsigned char *, size_t, std::string& , bool add_crlf = false);
+        // 编码(add_crlf是否增加换行符)
+        void encode(FILE *pFile, std::string& strOut, bool add_crlf = false);
+        void encode(const std::string& strIn, std::string& strOut, bool add_crlf = false);
+        void encode(const char *szIn, size_t len, std::string& strOut, bool add_crlf = false);
+        void encode(const unsigned char *szIn, size_t len, std::string& strOut, bool add_crlf = false);
         // 解码
-        void decode(const std::string&, std::string& );
-        void decode(const std::string&, unsigned char *, size_t&);
+        void decode(const std::string& strIn, std::string& strOut);
+        void decode(const std::string& strIn, unsigned char *szOut, size_t& len);
         // 长度
-        size_t decodeLength(const std::string& );
+        size_t decodeLength(const std::string& str64);
 
     private:
         Base64(const Base64& ) {}
