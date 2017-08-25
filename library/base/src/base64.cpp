@@ -83,7 +83,7 @@ void Base64::encode(const std::string& str_in, std::string& str_out, bool add_cr
     encode(str_in.c_str(), str_in.size(), str_out, add_crlf);
 }
 
-void Base64::encode(const char* input,size_t l,std::string& output, bool add_crlf)
+void Base64::encode(const char* input, size_t l, std::string& output, bool add_crlf)
 {
     size_t i = 0;
     size_t o = 0;
@@ -118,7 +118,7 @@ void Base64::encode(const char* input,size_t l,std::string& output, bool add_crl
     }
 }
 
-void Base64::encode(const unsigned char* input,size_t l,std::string& output,bool add_crlf)
+void Base64::encode(const unsigned char* input, size_t l, std::string& output, bool add_crlf)
 {
     size_t i = 0;
     size_t o = 0;
@@ -153,7 +153,7 @@ void Base64::encode(const unsigned char* input,size_t l,std::string& output,bool
     }
 }
 
-void Base64::decode(const std::string& input,std::string& output)
+void Base64::decode(const std::string& input, std::string& output)
 {
     size_t i = 0;
     size_t l = input.size();
