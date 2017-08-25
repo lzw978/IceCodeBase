@@ -29,6 +29,7 @@ LIBOBJ = ShareMemory.o\
          exception.o\
          toolKit.o\
          strHelper.o\
+         base64.o\
          apppubfunc.o
 
 ##################固定########################################
