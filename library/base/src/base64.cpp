@@ -74,7 +74,6 @@ void Base64::encode(FILE *fil, std::string& output, bool add_crlf)
             output += bstr[ (input[i + 2] & 0x3f) ];
         }
         o += 4;
-        //
         remain = fread(input,1,3,fil);
     }
 }
