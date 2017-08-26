@@ -407,6 +407,7 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* s
     else
     {
         printf("Write log error:[%s|%s]:%s\n", szTime, szFile, strerror(errno));
+        return ;
     }
 }
 
