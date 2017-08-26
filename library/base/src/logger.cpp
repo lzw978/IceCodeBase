@@ -283,21 +283,11 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* s
         return;
     }
 
-    // 初始化日志缓存
-    memset(g_szTmpG, 0, LOG_BUF);
-
-    va_list argList;
-    va_start(argList, format);
-    vsnprintf(g_szTmpG, LOG_BUF, format, argList);
-    va_end(argList);
-
-    //取当前系统日期，如20090909
-    GetLOGTimePath(szDate, szTime);
-
-    //合成路径
-    snprintf(szPath   , sizeof(szPath), "%s/%s", g_szLogPath, szDate);         // 日志文件目录
-    snprintf(szFile   , sizeof(szFile), "%s/%s.log", szPath, g_szLogFileName); // 日志文件名
-    snprintf(szErrFile, sizeof(szFile), "%s/%s.log", szPath, g_szErrLogFile);  // 错误日志文件名
+    // 设置默认日志大小(默认100M)
+    if (g_iMaxFileSize == 0)
+    {
+        g_iMaxFileSize = 1024*1024*100;
+    }
 
     // 设置错误类型和默认错误码
     switch(level)
@@ -328,8 +318,26 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* s
         break;
     }
 
+    //取当前系统日期，如20090909
+    GetLOGTimePath(szDate, szTime);
+    //合成路径
+    snprintf(szPath   , sizeof(szPath), "%s/%s", g_szLogPath, szDate);         // 日志文件目录
+    snprintf(szFile   , sizeof(szFile), "%s/%s.log", szPath, g_szLogFileName); // 日志文件名
+    snprintf(szErrFile, sizeof(szFile), "%s/%s.log", szPath, g_szErrLogFile);  // 错误日志文件名
     // 创建日志文件目录
-    CreatePathDir(szPath);
+    bool bIsSucc = CreatePathDir(szPath);
+    if ( !bIsSucc)
+    {
+        printf("create [%s] error[%s]", szPath, strerror(errno));
+        return ;
+    }
+
+    // 初始化日志缓存
+    memset(g_szTmpG, 0, LOG_BUF);
+    va_list argList;
+    va_start(argList, format);
+    vsnprintf(g_szTmpG, LOG_BUF, format, argList);
+    va_end(argList);
 
     // 超过每个日志文件最大容量
     if (g_iMaxFileSize > 0)

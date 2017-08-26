@@ -12,7 +12,7 @@
  *
  *         Author:  lzw978
  *   Organization:
- *    g++ -g -o logDemo -I../include main.cpp logDemo.cpp
+ *    g++ -g -o logDemo -I../include -L../ -lCommBase -lrt logDemo.cpp
  * =====================================================================================
  */
 #include <stdlib.h>
