@@ -1,18 +1,18 @@
 /*
  * =====================================================================================
  *
- *       Filename:  main.cpp
+ *       Filename:  logDemo.cpp
  *
- *    Description:  test logger
+ *    Description:  test log lib
  *
  *        Version:  1.0
  *        Created:  08/09/17 02:11:35
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  YOUR NAME (lzw978),
+ *         Author:  lzw978
  *   Organization:
- *    g++ -g -o MAIN -I../include main.cpp logger.cpp
+ *    g++ -g -o logDemo -I../include main.cpp logDemo.cpp
  * =====================================================================================
  */
 #include <stdlib.h>
@@ -24,7 +24,6 @@ int main(int argc, char* argv[])
     char szTest[]    = "Test logger libso";
     char szErrCode[] = "ERR0101";
     int iCode = 1024;
-
 
     // 设置日志大小
     SetLogMaxSize(1000000);

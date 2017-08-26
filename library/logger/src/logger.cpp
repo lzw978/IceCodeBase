@@ -25,16 +25,16 @@ using namespace std;
 
 #include "logger.h"
 
-#define LOG_BUF 1024*1024*3   // 日志缓存区大小,默认3M
+#define LOG_BUF 1024*1024*2   // 日志缓存区大小,默认2M
 
-int  g_iMaxFileSize = 0;      // 日志最大容量
-char g_szLogPath[100];        // 日志路径
-char g_szLogFileName[35];     // 日志名称
-char g_szLogFileNameOld[35];  // 旧日志名称
-int  g_iLogLevel;             // 日志等级
-char g_szMsgId[30+1];         // 消息ID值
-char g_szErrLogFile[300];     // 错误日志
-char *g_szTmpG;               // 打印信息
+int  g_iMaxFileSize = 0;       // 日志最大容量
+int  g_iLogLevel;              // 日志等级
+char g_szLogPath[128+1];       // 日志路径
+char g_szLogFileName[64+1];    // 日志名称
+char g_szLogFileNameOld[64+1]; // 旧日志名称
+char g_szErrLogFile[64+1];     // 错误日志名称
+char g_szMsgId[30+1];          // 消息ID值
+char *g_szTmpG;                // 打印信息
 
 // 获取当前系统时间
 char* GetErrTime()
@@ -67,14 +67,13 @@ const char* GetLOGTimePath(char* lpBuf, char* lpTime)
     }
 
     time(&timep);
-
     p = localtime(&timep);
 
     gettimeofday(&tp, NULL);
-    sprintf(lpBuf, "%04d%02d%02d", 1900 + p->tm_year, 1 + p->tm_mon, p->tm_mday);
+    sprintf(lpBuf , "%04d%02d%02d", 1900 + p->tm_year, 1 + p->tm_mon, p->tm_mday);
     sprintf(lpTime, "%02d:%02d:%02d:%06d", p->tm_hour, p->tm_min, p->tm_sec, (int)tp.tv_usec);
 
-    //2017-01-02 11:22:33.123
+    //example: lpbuf=20170808 lpTime=11:22:33.123
     return lpBuf;
 }
 
@@ -180,15 +179,15 @@ bool IsUTF8ToLOG(const void* pBuffer, long size)
 // 创建日志路径
 bool CreatePathDir(const char* lpPathName)
 {
+    int  nLen = 0;
+    char szPath[256+1] = { 0 };  //路径临时缓冲区
+    char cSeparator   = '/';
+
     //确保输入参数正确
     if(NULL == lpPathName || 0 == strlen(lpPathName))
     {
         return false;
     }
-
-    char    szPath[1024]    = { 0 };  //路径临时缓冲区
-    char    cSeparator              = '/';
-    int     nLen;
 
     //目录名中不用于出现的字符
     strncpy(szPath, lpPathName, sizeof(szPath) - 1);
@@ -233,15 +232,15 @@ void SetLogLevel(int iLogLevel)
 // 设置日志路径
 void SetLogPath(const char *pLogPath)
 {
-    strcpy(g_szLogPath, pLogPath);
+    strncpy(g_szLogPath, pLogPath, sizeof(g_szLogPath)-1);
     g_szTmpG = new char[LOG_BUF];
 }
 
 // 设置日志名称
 void SetLogFileName(const char *pLogFileName)
 {
-    strcpy(g_szLogFileName, pLogFileName);
-    strcpy(g_szLogFileNameOld, pLogFileName);
+    strncpy(g_szLogFileName   , pLogFileName, sizeof(g_szLogFileName)-1);
+    strncpy(g_szLogFileNameOld, pLogFileName, sizeof(g_szLogFileNameOld)-1);
     memset(g_szMsgId, 0, sizeof(g_szMsgId));
 }
 
@@ -249,43 +248,37 @@ void SetLogFileName(const char *pLogFileName)
 void SetNewLogFileName(char *pLogFileName, char *pMsgId)
 {
     memset(g_szMsgId, 0, sizeof(g_szMsgId));
-
-    strcpy(g_szLogFileName, g_szLogFileNameOld);
-    strcat(g_szLogFileName, "_");
-    strcat(g_szLogFileName, pLogFileName);
+    snprintf(g_szLogFileName, sizeof(g_szLogFileName), "%s_%s", g_szLogFileNameOld, pLogFileName);
 
     if (NULL != pMsgId)
-        strcpy(g_szMsgId, pMsgId);
+        strncpy(g_szMsgId, pMsgId, sizeof(g_szMsgId)-1);
 }
 
 // 重置日志名称
 void ReSetLogFileName()
 {
-    strcpy(g_szLogFileName, g_szLogFileNameOld);
+    strncpy(g_szLogFileName, g_szLogFileNameOld, sizeof(g_szLogFileName)-1);
     memset(g_szMsgId, 0, sizeof(g_szMsgId));
 }
 
 // 设置错误日志
 void SetErrLogFile(const char *pErrLogFile)
 {
-    strcpy(g_szErrLogFile, pErrLogFile);
+    strncpy(g_szErrLogFile, pErrLogFile, sizeof(g_szErrLogFile)-1);
 }
 
 // 日志打印函数
-void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* errcode, const char* format...)
+void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* szErrcode, const char* format...)
 {
-    string sPath         = "";
-    char szTime[32]      = { 0 };
-    char szDate[32]      = { 0 };
-    char szErrType[32]   = { 0 };
-    char szYear[4 + 1]   = { 0 };
-    char szMonth[2 + 1]  = { 0 };
-    char szToday[2 + 1]  = { 0 };
-    string strFile       = "";
-    string strErrFile    = "";
+    char szDate[8+1]     = {0}; // 当前日期
+    char szTime[15+1]     = {0}; // 当前时间
+    char szErrType[8+1]   = {0}; // 错误类型
+    char szPath[128+1]    = {0}; // 日志文件路径
+    char szFile[256+1]    = {0}; // 日志名称
+    char szErrFile[256+1] = {0}; // 错误记录日志
     FILE* logFile;
 
-    if(level > g_iLogLevel)
+    if (level > g_iLogLevel)
     {
         return;
     }
@@ -300,81 +293,63 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* e
 
     //取当前系统日期，如20090909
     GetLOGTimePath(szDate, szTime);
-    memcpy(szYear, szDate, sizeof(szYear) - 1);
-    memcpy(szMonth, szDate + 4, sizeof(szMonth) - 1);
-    memcpy(szToday, szDate + 6, sizeof(szToday) - 1);
-    szTime[23] = '\0';
 
     //合成路径
-    strFile  = g_szLogPath;
-    strFile += "/";
-    strFile += szYear;
-    strFile += szMonth;
-    strFile += szToday;
+    snprintf(szPath   , sizeof(szPath), "%s/%s", g_szLogPath, szDate);         // 日志文件目录
+    snprintf(szFile   , sizeof(szFile), "%s/%s.log", szPath, g_szLogFileName); // 日志文件名
+    snprintf(szErrFile, sizeof(szFile), "%s/%s.log", szPath, g_szErrLogFile);  // 错误日志文件名
 
-    //日志文件路径
-    sPath = strFile;
-    strFile += "/";
-    strFile += g_szLogFileName;
-    strFile += ".log";
-    //错误日志文件路径
-    strErrFile = sPath;
-    strErrFile += "/";
-    strErrFile += g_szErrLogFile;
-    strErrFile += ".log";
-
+    // 设置错误类型和默认错误码
     switch(level)
     {
     case L_SYS:
+        szErrcode = szErrcode==NULL?"SYS":szErrcode;
         sprintf(szErrType, "%7s", "eSys");
         break;
     case L_IMPORTANT:
+        szErrcode = szErrcode==NULL?"IMP":szErrcode;
         sprintf(szErrType, "%7s", "eImpt");
         break;
     case L_ERROR:
+        szErrcode = szErrcode==NULL?"ERR":szErrcode;
         sprintf(szErrType, "%7s", "eError");
         break;
     case L_INFO:
+        szErrcode = szErrcode==NULL?"INF":szErrcode;
         sprintf(szErrType, "%7s", "eInfo");
         break;
     case L_DEBUG:
+        szErrcode = szErrcode==NULL?"DBG":szErrcode;
         sprintf(szErrType, "%7s", "eDebug");
         break;
     default:
+        szErrcode = szErrcode==NULL?"UKW":szErrcode;
         sprintf(szErrType, "%7s", "eUnknow");
+        break;
     }
 
-    CreatePathDir(sPath.c_str());
+    // 创建日志文件目录
+    CreatePathDir(szPath);
 
     // 超过每个日志文件最大容量
     if (g_iMaxFileSize > 0)
     {
         struct stat stbuf;
 
-        if ( 0 == stat(strFile.c_str(), &stbuf) )
+        if ( 0 == stat(szFile, &stbuf) )
         {
             if (stbuf.st_size >= g_iMaxFileSize)
             {
-                string strNewFile = "";
-                //合成路径
-                strNewFile  = g_szLogPath;
-                strNewFile += "/";
-                strNewFile += szYear;
-                strNewFile += szMonth;
-                strNewFile += szToday;
-                strNewFile += "/";
-                strNewFile += g_szLogFileName;
-                strNewFile += ".";
-                strNewFile += szTime;
-                strNewFile += ".log";
-
-                rename(strFile.c_str(), strNewFile.c_str());
+                char szNewFile[256+1] = {0};
+                snprintf(szNewFile, sizeof(szNewFile), "%s/%s.%s.log", szPath, g_szLogFileName, szTime);
+                rename(szFile, szNewFile);
             }
         }
     }
 
-    if((logFile = fopen(strFile.c_str(), "a+")) != NULL)
+    if((logFile = fopen(szFile, "a+")) != NULL)
     {
+        // 文件名过长,只保留前30位
         char szFileName[30+1] = {0};
         int iFileLen = strlen(pFileName);
         if (iFileLen > 30)
@@ -383,15 +358,15 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* e
         }
         else
         {
-            strcpy(szFileName, pFileName);
+            strncpy(szFileName, pFileName, sizeof(szFileName)-1);
         }
 
-        fprintf(logFile, "[%07d|%11d|%s|%s|%30s|%06d|%7s]: %s\n", getpid(), (int)pthread_self(), szTime, g_szMsgId, szFileName, iFileLine, szErrType, g_szTmpG);
+        fprintf(logFile, "[%07d|%11d|%15s|%30s|%06d|%7s|%8s|%s]: %s\n", getpid(), (int)pthread_self(), szTime, szFileName, iFileLine, szErrType, szErrcode, g_szMsgId, g_szTmpG);
         fclose(logFile);
 
         if (L_ERROR == level)
         {
-            if (NULL == errcode)
+            if (NULL == szErrcode)
                 return;
 
             // 错误都记录
@@ -402,31 +377,20 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* e
                 {
                     struct stat stbuf;
 
-                    if ( 0 == stat(strErrFile.c_str(), &stbuf) )
+                    if ( 0 == stat(szErrFile, &stbuf) )
                     {
                         if (stbuf.st_size >= g_iMaxFileSize)
                         {
-                            string strNewFile = "";
-
-                            strNewFile  = g_szLogPath;
-                            strNewFile += "/";
-                            strNewFile += szYear;
-                            strNewFile += szMonth;
-                            strNewFile += szToday;
-                            strNewFile += "/";
-                            strNewFile += g_szErrLogFile;
-                            strNewFile += ".";
-                            strNewFile += szTime;
-                            strNewFile += ".log";
-
-                            rename(g_szErrLogFile, strNewFile.c_str());
+                            char szNewFile[256+1] = {0};
+                            snprintf(szNewFile, sizeof(szNewFile), "%s/%s.%s.log", szPath, g_szErrLogFile, szTime);
+                            rename(g_szErrLogFile, szNewFile);
                         }
                     }
                 }
-                FILE *pError = fopen(strErrFile.c_str(), "a+");
+                FILE *pError = fopen(szErrFile, "a+");
                 if (NULL != pError)
                 {
-                    fprintf(pError, "[%07d|%11d|%s%s|%s|%30.30s|%06d|%7s]: %s\n", getpid(), (int)pthread_self(), szDate, szTime, g_szMsgId, szFileName, iFileLine, szErrType, g_szTmpG);
+                    fprintf(pError, "[%07d|%11d|%8s_%15s|%30.30s|%06d|%7s|%8s|%s]: %s\n", getpid(), (int)pthread_self(), szDate, szTime, szFileName, iFileLine, szErrType, szErrcode, g_szMsgId, g_szTmpG);
                     fclose(pError);
                 }
             }
@@ -434,7 +398,7 @@ void _Trace(const char* pFileName, int iFileLine, LOG_LEVEL level, const char* e
     }
     else
     {
-        printf("Write log error:[%s|%s]%s\n", szTime, strFile.c_str(), strerror(errno));
+        printf("Write log error:[%s|%s]:%s\n", szTime, szFile, strerror(errno));
     }
 }
 
