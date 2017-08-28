@@ -746,7 +746,7 @@ bool Directory::getAllSubFiles(string strDirPath, vector<FileInfo> &files, bool 
     return true;
 }
 // 创建目录/路径
-int Directory::mkdir(string strFullPath, bool bCreateFullPath)
+bool Directory::mkdir(string strFullPath)
 {
     strFullPath = StrHelper::replace(strFullPath, "\\", "/");
     strFullPath = StrHelper::replaceLoop(strFullPath, "//", "/");
@@ -775,7 +775,7 @@ int Directory::mkdir(string strFullPath, bool bCreateFullPath)
         int err = 0;
         if (!isDirectory(paths[i]))
         {
-            err = mkdir(paths[i].c_str(), 0766);
+            err = ::mkdir(paths[i].c_str(), 0766);
         }
 
         if (!isDirectory(paths[i]))
@@ -811,7 +811,7 @@ int Directory::rmdir(string strFullPath, bool bFailWhenNoEmpty)
         }
     }
 
-    int r = rmdir(strFullPath.c_str());
+    int r = ::rmdir(strFullPath.c_str());
     int iErrno = errno;
     if (r!=0 || Directory::isDirectory(strFullPath))
     {
