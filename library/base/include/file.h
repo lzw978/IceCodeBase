@@ -205,9 +205,9 @@ namespace commbase
         string separator(eDirSepStyle style=eDirSepStyleUNIX);
 
         // 静态方法
-        // 获取目录下第一层文件(files:文件存储列表 bIncludeDot:结果是否包含. ..)
+        // 获取目录下第一层文件(files:文件存储列表 bIncludeDot:为true结果则包含. ..)
         static bool getSubFiles(string strDirPath, vector<FileInfo> &files, bool bIncludeDot=false) throw(Exception);
-        // 获取目录下所有文件(含子目录中)
+        // 获取目录下所有文件(含子目录中文件)
         static bool getAllSubFiles(string strDirPath, vector<FileInfo> &files, bool bIncludeDot=false);
         // 创建目录/路径
         static int mkdir(string strFullPath, bool bCreateFullPath=true);

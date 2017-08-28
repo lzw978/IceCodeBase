@@ -621,7 +621,7 @@ bool Directory::getCurFile(FileInfo &fileInfo) throw(Exception)
 {
     bool r = false;
     fileInfo.reset();
-    if (m_Handle->eof && m_Handle->current != NULL)
+    if ( !m_Handle->eof && m_Handle->current != NULL)
     {
         string fullpath = m_DirInfo->getFullPath() + "/" + m_Handle->current->d_name;
         try
@@ -724,7 +724,7 @@ bool Directory::getAllSubFiles(string strDirPath, vector<FileInfo> &files, bool 
             FileInfo file;
             for (;dir.getNextFile(file); )
             {
-                if (!bIncludeDot && (file.name() != "." && file.name() != ".."))
+                if (!bIncludeDot && (file.name() == "." || file.name() == ".."))
                     continue;
 
                 if (file.isDirectory() && (file.name() != "." && file.name() != ".."))
