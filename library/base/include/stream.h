@@ -23,7 +23,7 @@ namespace commbase
     {
     public:
         Stream(){};
-        virtual ~Stream();
+        virtual ~Stream(){};
         // 关闭
         virtual void close() = 0;
         // 判断是否打开
