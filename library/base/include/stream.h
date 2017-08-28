@@ -14,7 +14,7 @@
 #ifndef __LIB_STREAM_H__
 #define __LIB_STREAM_H__
 
-#include "exception.hpp"
+#include "exception.h"
 
 namespace commbase
 {

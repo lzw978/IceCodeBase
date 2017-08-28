@@ -1,7 +1,7 @@
 /********************************************
  **  模块名称：file.h
  **  模块功能:
- **  模块简述: 文件通用操作封装
+ **  模块简述: 目录/文件通用操作封装
  **  编 写 人:
  **  日    期: 2017.08.21
  **  修 改 人:
@@ -16,6 +16,7 @@
 
 #include <string>
 #include <vector>
+#include <stack>
 
 #include "datetime.h"
 #include "stream.h"
@@ -39,13 +40,15 @@ namespace commbase
     // 文件类型
     enum eFileType
     {
-        eFileTypeUnknown     =  0, // 未知/虚拟
-        eFileTypeFile        =  1, // 普通文件
-        eFileTypeDirectory   =  2, // 目录
-        eFileTypeCharDevice  =  4, // 字符设备
-        eFileTypeBlockDevice =  8, // 块设备
-        eFileTypeLink        = 16, // 软连接
-        eFileTypePipe        = 32  // 命名/匿名管道
+        eFileTypeUnknown     = 0, // 未知/虚拟
+        eFileTypeFile        = 1, // 普通文件
+        eFileTypeDirectory   = 2, // 目录
+        eFileTypeCharDevice  = 3, // 字符设备
+        eFileTypeBlockDevice = 4, // 块设备
+        eFileTypeLink        = 5, // 软连接
+        eFileTypeFifo        = 6, // FIFO文件
+        eFileTypeSock        = 7, // SOCKET文件
+        eFileTypePipe        = 8  // 命名/匿名管道
     };
     // 目录类型
     enum eDirSepStyle
@@ -76,11 +79,11 @@ namespace commbase
         // 返回扩展名(不含.号)
         static string getSuffix(string strPath);
         // 修改扩展名
-        static string changeSuffix(string strPath, string strSuffix);
+        static string changeSuffix(string strPath, string newSuffix);
         // 修改路径中分隔符
         static string setDirSepStyle(string strOrigPath, eDirSepStyle toStyle);
         // 修改扩展名
-        FileInfo& changeSuffix(string strSuffix);
+        FileInfo& changeSuffix(string newSuffix);
         // 不含名字的路径
         const string path(eDirSepStyle toStyle=eDirSepStyleAuto) const;
         // 设置路径
@@ -117,19 +120,20 @@ namespace commbase
         bool isCharDevice() const;
         bool isBlockDevice() const;
         bool isLink() const;
+        bool isFifo() const;
+        bool isSock() const;
         bool isPipe() const;
         // 重置
         void reset();
     private:
-        string strPath;       // 路径
-        string strName;       // 文件名
-        string strDirSepChar; // 分隔符
-        TUInt64 lSize;        // 文件大小
-        eFileType eType;      // 文件类型
-        Datetime  ctime;      // 创建时间
-        Datetime  mtime;      // 修改时间
-        Datetime  atime;      // 访问时间
-        void setValues(const FileInfo &other);
+        string    m_strDirSepChar; // 分隔符
+        string    m_strPath;  // 路径
+        string    m_strName;  // 文件名
+        TUInt64   m_lSize;    // 文件大小
+        eFileType m_eType;    // 文件类型
+        Datetime  m_ctime;    // 创建时间
+        Datetime  m_mtime;    // 修改时间
+        Datetime  m_atime;    // 访问时间
     };
 
     // 文件读写类(文件系统)
@@ -145,15 +149,15 @@ namespace commbase
         // 关闭文件
         virtual void close();
         // 写数据
-        virtual size_t write(const char* buffer, size_t count);
+        virtual size_t write(const char* buffer, size_t nCount);
         // 读数据
-        virtual size_t read(char* buffer, size_t count);
+        virtual size_t read(char* buffer, size_t nCount);
         // 移动读写指针
         virtual bool seek(off_t offset, int iMode);
         // 文件是否打开
         bool isOpened();
-        // 截断/扩展文件
-        void truncate(TInt64 lSize);
+        // 改变文件大小
+        void truncate(TInt64 offset);
         // 文件大小
         TInt64 size();
         // 重新打开
@@ -171,15 +175,15 @@ namespace commbase
         // 移动文件
         static bool move(const string &strPathFrom, const string &strPathTo);
         // 是否是文件
-        static bool isFile(const string &strPath);
+        static bool isFile(const string &strFullPath);
         // 获取文件信息
         static FileInfo getFileInfo(const string &strPath) throw(Exception);
         // 创建临时文件供读写
         static void mktemp(const string &strPerfix, File& file) throw(Exception);
     private:
-        FILE* fp;
-        string strPath;
-        string strOpenMode;
+        FILE*  m_fp;
+        string m_strPath;
+        string m_strOpenMode;
     };
 
     // 目录操作
@@ -189,16 +193,20 @@ namespace commbase
         Directory(string strDirPath);
         virtual ~Directory();
 
+        // 重设目录流读取位置
         void rewind() throw(Exception);
+        // 获取当前文件
         bool getCurFile(FileInfo &fileInfo) throw(Exception);
+        // 获取下一文件
         bool getNextFile(FileInfo &fileInfo) throw(Exception);
+        // 设置分隔符
         void setSeparator(char separator);
-        string separator(eDirSepStyle style=eDirSepStyleWIN);
-        FileInfo getDirInfo();
+        // 返回分隔符
+        string separator(eDirSepStyle style=eDirSepStyleUNIX);
 
         // 静态方法
         // 获取目录下第一层文件(files:文件存储列表 bIncludeDot:结果是否包含. ..)
-        static bool getSubFile(string strDirPath, vector<FileInfo> &files, bool bIncludeDot=false) throw(Exception);
+        static bool getSubFiles(string strDirPath, vector<FileInfo> &files, bool bIncludeDot=false) throw(Exception);
         // 获取目录下所有文件(含子目录中)
         static bool getAllSubFiles(string strDirPath, vector<FileInfo> &files, bool bIncludeDot=false);
         // 创建目录/路径
@@ -210,7 +218,7 @@ namespace commbase
     private:
         FileInfo *m_DirInfo;
         struct dir_handle_t;
-        dir_handle_t m_Handle;
+        dir_handle_t *m_Handle;
         string m_Separator;
     };
 }
