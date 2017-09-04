@@ -56,7 +56,7 @@ string Digest::fromFile(string filePath) throw (Exception)
         size_t perBytesReaded = 0;            // 已读长度
 
         // 读取文件内容
-        for ( ;readedAllBytes<fileSize; );
+        for ( ;readedAllBytes<fileSize; )
         {
             // 判断文件产地与已读长度
             if( (fileSize-readedAllBytes) < (int)kBufferSize)
