@@ -34,17 +34,10 @@ ab+ 以读/写方式打开一个二进制文件，允许读或在文件末追加
 
 #include "datetime.h"
 #include "stream.h"
+#include "commdef.h"
 
 #ifndef _WIN32
 #include <dirent.h>
-#endif
-
-#ifdef _WIN32
-    typedef __int64 TInt64;
-    typedef unsigned __int64 TUInt64;
-#else
-    typedef long long TInt64;
-    typedef unsigned long long TUInt64;
 #endif
 
 namespace commbase
