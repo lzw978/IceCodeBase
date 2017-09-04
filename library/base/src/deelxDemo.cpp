@@ -10,7 +10,7 @@
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  来源于官方网站
+ *         Author:  来源于官方网站http://www.regexlab.com/
  *   Organization:
  *   编译src目录下执行：
  * g++ -g -o deelxDemo -I../include -L../ -lCommBase -lrt deelxDemo.cpp
