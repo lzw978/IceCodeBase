@@ -13,7 +13,7 @@
  *         Author:  来源于官方网站http://www.regexlab.com/
  *   Organization:
  *   编译src目录下执行：
- * g++ -g -o deelxDemo -I../include -L../ -lCommBase -lrt deelxDemo.cpp
+ * g++ -g -o deelxDemo -I../include deelxDemo.cpp
  * =====================================================================================
  */
 
@@ -35,8 +35,8 @@ int test_email(const char * string)
 
 int main(int argc, char * argv[])
 {
-    char * str1 = "bob@smith.com";
-    char * str2 = "bob@.com";
+    const char * str1 = "bob@smith.com";
+    const char * str2 = "bob@.com";
 
     printf("'%s' => %s\n", str1, (test_email(str1) ? "yes" : "no"));
     printf("'%s' => %s\n", str2, (test_email(str2) ? "yes" : "no"));
