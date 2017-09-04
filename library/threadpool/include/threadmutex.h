@@ -16,7 +16,7 @@
 
 #include <pthread.h>
 
-class CThreadConditionMutex 
+class CThreadConditionMutex
 
 {
 private:
@@ -25,11 +25,11 @@ private:
     // 条件变量
     pthread_cond_t      cond_h;
     bool                m_IsValid;
-protected: 
-    
-public: 
-    CThreadConditionMutex(); 
-    virtual ~CThreadConditionMutex(); 
+protected:
+
+public:
+    CThreadConditionMutex();
+    virtual ~CThreadConditionMutex();
 
     // 等待
     bool wait();
@@ -42,7 +42,7 @@ public:
     // 唤醒
     bool notify();
 
-}; 
+};
 
 class ScopedLock {
     private:
