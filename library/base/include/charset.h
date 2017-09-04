@@ -106,7 +106,9 @@ namespace commbase
 
     //! 编码转换宏
     #define _G2A(x) commbase::IConv::trTS(x).c_str()
+    // GBK转UTF8
     #define _G2U(x) gbk2utf8(x).c_str()
+    // UTF8转换为GBK
     #define _U2G(x) utf82gbk(x).c_str()
 }
 
