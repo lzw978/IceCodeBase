@@ -82,7 +82,11 @@ Mutex::~Mutex()
     }
     else
     {
-        delete mHandle;
+        if (NULL != mHandle)
+        {
+            delete mHandle;
+            mHandle = NULL;
+        }
     }
 }
 // 加锁
