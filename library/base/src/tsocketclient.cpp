@@ -26,19 +26,19 @@ TEndpoint::TEndpoint()
     m_strHost     = "0.0.0.0";
     m_iPort       = 0;
     m_iTimeout    = 3000;
-    m_isTcp       = true;
     m_iGrid       = 0;
     m_iQos        = 0;
     m_iWeight     = -1;
     m_iWeightType = 0;
+    m_bIsTcp      = true;
 }
 
-void TEndpoint::init(const string& host, int port, int timeout, int istcp, int grid, int qos, int weight, unsigned int weighttype)
+void TEndpoint::init(const string& host, int port, int timeout, bool istcp, int grid, int qos, int weight, unsigned int weighttype)
 {
     m_strHost     = host;
     m_iPort       = port;
     m_iTimeout    = timeout;
-    m_isTcp       = istcp;
+    m_bIsTcp      = istcp;
     m_iGrid       = grid;
     m_iQos        = qos;
 
@@ -86,11 +86,11 @@ void TEndpoint::parse(const string &strDesc)
     string desc = strDesc.substr(beg, end - beg);
     if (desc == "tcp")
     {
-        m_isTcp = true;
+        m_bIsTcp = true;
     }
     else if (desc == "upd")
     {
-        m_isTcp = false;
+        m_bIsTcp = false;
     }
     else
     {

@@ -28,7 +28,7 @@ namespace commbase
         // 构造
         TEndpoint();
         // 构造
-        TEndpoint(const string& host, int port, int timeout, int istcp = true, int grid = 0, int qos = 0, int weight = -1, unsigned int weighttype = 0)
+        TEndpoint(const string& host, int port, int timeout, bool istcp = true, int grid = 0, int qos = 0, int weight = -1, unsigned int weighttype = 0)
         {
             init(host, port, timeout, istcp, grid, qos, weight, weighttype);
         }
@@ -43,11 +43,11 @@ namespace commbase
             m_strHost     = t.m_strHost;
             m_iPort       = t.m_iPort;
             m_iTimeout    = t.m_iTimeout;
-            m_isTcp       = t.m_isTcp;
             m_iGrid       = t.m_iGrid;
             m_iQos        = t.m_iQos;
             m_iWeight     = t.m_iWeight;
             m_iWeightType = t.m_iWeightType;
+            m_bIsTcp      = t.m_bIsTcp;
         }
         // 赋值函数
         TEndpoint& operator = (const TEndpoint& t)
@@ -57,7 +57,7 @@ namespace commbase
                 m_strHost     = t.m_strHost;
                 m_iPort       = t.m_iPort;
                 m_iTimeout    = t.m_iTimeout;
-                m_isTcp       = t.m_isTcp;
+                m_bIsTcp      = t.m_bIsTcp;
                 m_iGrid       = t.m_iGrid;
                 m_iQos        = t.m_iQos;
                 m_iWeight     = t.m_iWeight;
@@ -68,7 +68,7 @@ namespace commbase
         // 相等判断
         bool operator == (const TEndpoint& t)
         {
-            return (m_strHost == t.m_strHost && m_iPort == t.m_iPort && m_iTimeout == t.m_iTimeout && m_isTcp == t.m_isTcp &&
+            return (m_strHost == t.m_strHost && m_iPort == t.m_iPort && m_iTimeout == t.m_iTimeout && m_bIsTcp == t.m_bIsTcp &&
                     m_iGrid == t.m_iGrid     && m_iQos == t.m_iQos   && m_iWeight == t.m_iWeight   && m_iWeightType == t.m_iWeightType);
         }
         // 设置ip
@@ -104,12 +104,12 @@ namespace commbase
         // 设置为tcp或udp
         void setTcp(bool bTcp)
         {
-            m_isTcp = bTcp;
+            m_bIsTcp = bTcp;
         }
         // 判断是为tcp
         bool isTcp() const
         {
-            return m_isTcp;
+            return m_bIsTcp;
         }
         // 设置路由状态
         void setGrid(int grid)
@@ -170,16 +170,16 @@ namespace commbase
         // 解析字符串形式的端口
         void parse(const string &strDesc);
     private:
-        void init(const string& host, int port, int timeout, int istcp, int grid, int qos, int weight, unsigned int weighttype);
+        void init(const string& host, int port, int timeout, bool istcp, int grid, int qos, int weight, unsigned int weighttype);
 
     private:
         string m_strHost;           // ip
         int m_iPort;                // 端口
         int m_iTimeout;             // 超时时间
-        int m_isTcp;                // 类型(TCP/UDP)
         int m_iGrid;                // 路由状态
         int m_iQos;                 // 网络Qos中的dscp值
         int m_iWeight;              // 节点的静态权重值
+        bool m_bIsTcp;              // 类型(TCP/UDP)
         unsigned int m_iWeightType; // 节点的权重使用方式
     };
 
