@@ -11,8 +11,8 @@
  **  问    题：
 *********************************************/
 
-#ifndef __LIB_TSOCKET_LIB__
-#define __LIB_TSOCKET_LIB__
+#ifndef __LIB_TSOCKET_H__
+#define __LIB_TSOCKET_H__
 
 #include <sys/socket.h>
 #include <sys/types.h>
