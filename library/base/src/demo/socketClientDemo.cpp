@@ -13,7 +13,7 @@
  *         Author:  lzw978
  *   Organization:
  *   编译src目录下执行：
- * g++ -g -o socketServerDemo -I../../include -L../../ -lCommBase -lrt -ldl socketServerDemo.cpp
+ * g++ -g -o socketClientDemo -I../../include -L../../ -lCommBase -lrt -ldl socketClientDemo.cpp
  * =====================================================================================
  */
 #include <sys/socket.h>
@@ -26,6 +26,7 @@
 #include <sys/un.h>
 #include <cerrno>
 #include <iostream>
+#include <stdio.h>
 #include "tsocket.h"
 #include "tepoller.h"
 
@@ -35,27 +36,18 @@ using namespace std;
 #define INVALID_SOCKET -1
 int main(int argc, char *argv[])
 {
-    int n;
-    char buff[1024+1] = {0};
+    char sendline[1024+1] = {0};
     try
     {
         TSocket tcSocket;
         tcSocket.createSocket();
-        tcSocket.bind("192.168.128.128", 8765);
-        tcSocket.listen(5);
+        tcSocket.connect("192.168.128.1", 8765);
 
+        // 从命令行读入,发送到服务器
         while(1)
         {
-            TSocket tcClient;
-            struct sockaddr_in sockaddr;
-            socklen_t iSockLen = sizeof(sockaddr_in);
-            tcSocket.accept(tcClient, (struct sockaddr*)&sockaddr, iSockLen);
-
-            n = tcClient.recv(buff, 1024, 0);
-            buff[n] = '\0';
-            cout << "recv msg from client: " << endl;
-            cout << buff << endl;
-            tcClient.close();
+            fgets(sendline, 1024, stdin);
+            tcSocket.send(sendline, strlen(sendline));
         }
         tcSocket.close();
     }
