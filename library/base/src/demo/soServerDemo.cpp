@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
     sockaddr.sin_family = AF_INET;
     sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    sockaddr.sin_port = htons(10004);
+    sockaddr.sin_port = htons(8765);
 
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
     bind(listenfd, (struct sockaddr *)&sockaddr, sizeof(sockaddr));
@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
         n = recv(connfd, buff, MAXLINE, 0);
         buff[n] = '\0';
         cout << "recv msg from client :" << buff << endl;
+        n = send(connfd, "Recv:OK", 7, 0);
         close(connfd);
     }
     close(listenfd);

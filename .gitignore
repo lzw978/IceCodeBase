@@ -1,3 +1,6 @@
 
 *.json
 library/hiredis-vip/.travis.yml
+library/base/include/procbase.h
+library/base/src/demo/shareLibraryDemo.cpp
+library/base/src/procbase.cpp

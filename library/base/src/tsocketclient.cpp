@@ -228,7 +228,6 @@ void TEndpoint::parse(const string &strDesc)
 // 校验socket
 int CTcpClient::checkSocket()
 {
-    cout << "debug begin" << endl;
     if (!m_socket.isValid())
     {
         try
@@ -260,7 +259,6 @@ int CTcpClient::checkSocket()
             {
                 if (errno != EINPROGRESS)
                 {
-                    cout << "debug errno=" << errno << endl;
                     m_socket.close();
                     return EM_CONNECT;
                 }
@@ -283,7 +281,6 @@ int CTcpClient::checkSocket()
             }
             else if (iRetCode == 0)
             {
-                cout << "debug timeout =" << errno << endl;
                 m_socket.close();
                 return EM_TIMEOUT;
             }
@@ -318,13 +315,11 @@ int CTcpClient::checkSocket()
             return EM_SOCKET;
         }
     }
-    cout << "debug end" << endl;
     return EM_SUCCESS;
 }
 // 发送到服务器
 int CTcpClient::send(const char *sSendBuffer, size_t iSendLen)
 {
-    cout << "debug send begin" << endl;
     int iRet = checkSocket();
     if (iRet < 0)
     {
@@ -337,7 +332,6 @@ int CTcpClient::send(const char *sSendBuffer, size_t iSendLen)
         m_socket.close();
         return EM_SEND;
     }
-    cout << "debug send end" << endl;
     return EM_SUCCESS;
 }
 // 从服务器返回不超过iRecvLen的字节
@@ -485,7 +479,7 @@ int CTcpClient::recvAll(string &sRecvBuffer)
             else if (len == 0)
             {
                 m_socket.close();
-                return EM_CLOSE;
+                return EM_SUCCESS;
             }
 
             sRecvBuffer.append(sTmpBuffer, len);
