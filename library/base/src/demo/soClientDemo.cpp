@@ -13,7 +13,7 @@
  *         Author:  lzw978
  *   Organization:
  *   编译src目录下执行：
- * g++ -g -o soClientDemo -I../../include -L../../ -lCommBase -lrt -ldl soClientDemo.cpp
+ * g++ -g -o soClientDemo -I../../include -L../../ -L/usr/lib64/mysql -lmysqlclient -lCommBase -lrt -ldl soClientDemo.cpp
  * =====================================================================================
  */
 #include <sys/socket.h>
