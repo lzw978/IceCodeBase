@@ -318,7 +318,7 @@ string TMySql::buildReplaceSQL(const string &sTableName, const RECORD_DATA &mpCo
             }
             else
             {
-                sColumnValues << ",'" + escapeString(it->second.second) << "'";
+                sColumnValues << ",'" << escapeString(it->second.second) << "'";
             }
         }
     }
