@@ -10,6 +10,9 @@
  **  特别说明:
  **  问    题：
 *********************************************/
+#ifndef __LIB_STRHELPER_HPP__
+#define __LIB_STRHELPER_HPP__
+
 #include <string>
 #include <vector>
 #include "toolKit.h"
@@ -132,3 +135,5 @@ namespace commbase
         void unProcessVal(string &strKey);
     };
 }
+
+#endif

@@ -13,6 +13,7 @@
 
 #include <memory>
 #include "digest.h"
+#include "membuffer.h"
 #include "file.h"
 #include "logger.h"
 
@@ -47,7 +48,10 @@ string Digest::fromFile(string filePath) throw (Exception)
 
         // 申请缓存区
         const size_t kBufferSize = 1024 * 10;
-        auto_ptr<char> pBuffer(new char[kBufferSize+1]);
+        //auto_ptr<char> pBuffer(new char[kBufferSize+1]);
+        MemBuffer buf;
+        buf.truncate(kBufferSize+1);
+        char *pBuffer = buf.getBuffer();
 
         off_t fileSize = fileInfo.size(); // 文件长度(字节)
         off_t readedAllBytes = 0;         // 已读字节
@@ -70,11 +74,11 @@ string Digest::fromFile(string filePath) throw (Exception)
                 perBytesToRead = kBufferSize;
             }
             // 初始化
-            memset(pBuffer.get(), 0, kBufferSize);
+            memset(pBuffer, 0x00, kBufferSize);
             // 安装设定长度读取文件内容
-            perBytesReaded = doFile.read(pBuffer.get(), perBytesToRead);
+            perBytesReaded = doFile.read(pBuffer, perBytesToRead);
             // 更新摘要
-            update(pBuffer.get(), perBytesReaded);
+            update(pBuffer, perBytesReaded);
             // 增加已读长度
             readedAllBytes += perBytesReaded;
         }
